@@ -4,7 +4,7 @@
   <parent>
     <artifactId>teamcity-web-ssh</artifactId>
     <groupId>ru.mail.teamcity</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
   </parent>
   <artifactId>build</artifactId>
   <packaging>pom</packaging>
@@ -13,12 +13,14 @@
       <teamcity.teamcity-web-ssh.plugin.version>snapshot-${maven.build.timestamp}</teamcity.teamcity-web-ssh.plugin.version>
       <teamcity.teamcity-web-ssh.plugin.vendorName>Plugin vendor name</teamcity.teamcity-web-ssh.plugin.vendorName>
       <teamcity.teamcity-web-ssh.plugin.vendorUrl>Plugin vendor URL</teamcity.teamcity-web-ssh.plugin.vendorUrl>
+      <pluginLocation>/opt/jetbrains/TeamCity/PluginDev.Data.9.0/</pluginLocation>
+      <plugin.final.name>${project.parent.artifactId}-${project.version}</plugin.final.name>
   </properties>
   <dependencies>
       <dependency>
            <groupId>ru.mail.teamcity</groupId>
            <artifactId>teamcity-web-ssh-server</artifactId>
-           <version>1.0-SNAPSHOT</version>
+           <version>1.0</version>
       </dependency>
   </dependencies>
   <build>
@@ -27,7 +29,7 @@
             <groupId>com.google.code.maven-replacer-plugin</groupId>
             <artifactId>replacer</artifactId>
             <version>1.5.2</version>
-            <executions>                
+            <executions>
                 <execution>
                     <phase>process-sources</phase>
                     <goals>
@@ -51,7 +53,7 @@
                         <token>@VendorURL@</token>
                         <value>${teamcity.teamcity-web-ssh.plugin.vendorUrl}</value>
                     </replacement>
-                </replacements>                        
+                </replacements>
             </configuration>
         </plugin>
         <plugin>
@@ -65,7 +67,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>teamcity-web-ssh</finalName>
+                  <finalName>${plugin.final.name}</finalName>
                   <outputDirectory>${project.parent.build.directory}</outputDirectory>
                   <appendAssemblyId>false</appendAssemblyId>
                   <descriptors>
@@ -73,6 +75,25 @@
                   </descriptors>
                 </configuration>
               </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+                <execution>
+                    <phase>install</phase>
+                    <configuration>
+                        <tasks>
+                            <copy
+                                    file="${project.parent.build.directory}/${plugin.final.name}.zip"
+                                    tofile="${pluginLocation}/plugins/${plugin.final.name}.zip"
+                                    />
+                        </tasks>
+                    </configuration>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                </execution>
             </executions>
         </plugin>
     </plugins>
