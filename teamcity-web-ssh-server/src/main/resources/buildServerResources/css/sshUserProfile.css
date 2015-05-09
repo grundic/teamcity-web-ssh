@@ -1,0 +1,16 @@
+table.webSshHosts {
+    width: 50%;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+}
+
+table.webSshHosts tr.header {
+    background-color: #f5f5f5;
+}
+
+table.webSshHosts td, table.webSshHosts th {
+    padding: 3px 3px 3px 3px;
+    border-top: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    text-align: left;
+}
