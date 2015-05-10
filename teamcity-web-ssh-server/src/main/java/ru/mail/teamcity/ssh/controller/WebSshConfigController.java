@@ -1,4 +1,4 @@
-package ru.mail.teamcity.ssh.web;
+package ru.mail.teamcity.ssh.controller;
 
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  * Date: 01/05/15
  * Time: 16:41
  */
-public class UserProfileController extends BaseFormXmlController {
+public class WebSshConfigController extends BaseFormXmlController {
 
     @NotNull
     private final PluginDescriptor pluginDescriptor;
@@ -41,7 +41,7 @@ public class UserProfileController extends BaseFormXmlController {
     // TODO fix host regex: it should not complain on underscore symbol
     private static final Pattern validHostnameRegex = Pattern.compile("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$");
 
-    public UserProfileController(
+    public WebSshConfigController(
             @NotNull SBuildServer buildServer,
             @NotNull WebControllerManager webControllerManager,
             @NotNull PluginDescriptor pluginDescriptor,
@@ -74,7 +74,7 @@ public class UserProfileController extends BaseFormXmlController {
         bean = null == bean ? new HostBean() : bean;
 
         params.put("bean", bean);
-        return new ModelAndView(pluginDescriptor.getPluginResourcesPath("sshUserProfile.jsp"), params);
+        return new ModelAndView(pluginDescriptor.getPluginResourcesPath("webSshConfig.jsp"), params);
     }
 
     @Override

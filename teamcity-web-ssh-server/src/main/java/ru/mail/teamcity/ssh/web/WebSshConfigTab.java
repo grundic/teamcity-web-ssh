@@ -20,15 +20,12 @@ import java.util.Map;
  * Date: 07/05/15
  * Time: 17:36
  */
-public class UserProfileTab extends SimpleCustomTab {
-
-    @NotNull
-    private final PluginDescriptor pluginDescriptor;
+public class WebSshConfigTab extends SimpleCustomTab {
 
     @NotNull
     private final ServerPaths serverPaths;
 
-    public UserProfileTab(
+    public WebSshConfigTab(
             @NotNull final PluginDescriptor pluginDescriptor,
             @NotNull PagePlaces pagePlaces,
             @NotNull ServerPaths serverPaths
@@ -37,13 +34,12 @@ public class UserProfileTab extends SimpleCustomTab {
                 pagePlaces,
                 PlaceId.MY_TOOLS_TABS,
                 AppConfiguration.PLUGIN_NAME,
-                pluginDescriptor.getPluginResourcesPath("sshUserProfileTab.jsp"),
+                pluginDescriptor.getPluginResourcesPath("webSshConfigTab.jsp"),
                 "Web Ssh");
-        this.pluginDescriptor = pluginDescriptor;
         this.serverPaths = serverPaths;
 
-        addCssFile(pluginDescriptor.getPluginResourcesPath("css/sshUserProfile.css"));
-        addJsFile(pluginDescriptor.getPluginResourcesPath("js/sshUserProfile.js"));
+        addCssFile(pluginDescriptor.getPluginResourcesPath("css/webSshConfig.css"));
+        addJsFile(pluginDescriptor.getPluginResourcesPath("js/webSshConfig.js"));
 
         register();
     }
