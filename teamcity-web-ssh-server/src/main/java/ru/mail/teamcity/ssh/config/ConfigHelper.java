@@ -1,6 +1,7 @@
 package ru.mail.teamcity.ssh.config;
 
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +35,11 @@ public class ConfigHelper {
             JAXBContext context = JAXBContext.newInstance(HostBean.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
             if (file.isFile()) {
-                return (HostBean) unmarshaller.unmarshal(file);
+                HostBean host = (HostBean) unmarshaller.unmarshal(file);
+                if (EncryptUtil.isScrambled(host.getPassword())) {
+                    host.setPassword(EncryptUtil.unscramble(host.getPassword()));
+                }
+                return host;
             }
             return null;
         }
@@ -42,6 +47,7 @@ public class ConfigHelper {
 
     private static void write(@NotNull final File file, @NotNull HostBean host) throws JAXBException {
         synchronized (getOrCreateLock(file)) {
+            host.setPassword(EncryptUtil.scramble(host.getPassword()));
             JAXBContext context = JAXBContext.newInstance(HostBean.class);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
