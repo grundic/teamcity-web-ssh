@@ -50,7 +50,7 @@ public class WebSshConfigController extends BaseFormXmlController {
         super(buildServer);
         this.pluginDescriptor = pluginDescriptor;
         this.serverPaths = serverPaths;
-        webControllerManager.registerController("/sshUserProfile.html", this);
+        webControllerManager.registerController("/webSshConfigController.html", this);
     }
 
     @Override

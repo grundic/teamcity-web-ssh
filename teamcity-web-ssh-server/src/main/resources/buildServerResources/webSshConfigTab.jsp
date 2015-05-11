@@ -8,7 +8,7 @@
 <jsp:useBean id="hosts" scope="request"
              type="java.util.List<ru.mail.teamcity.ssh.config.HostBean>"/>
 
-<c:set var="controllerAjaxUrl"><c:url value="/sshUserProfile.html"/></c:set>
+<c:set var="controllerAjaxUrl"><c:url value="/webSshConfigController.html"/></c:set>
 <c:set var="formId"><c:url value="webSshHostForm"/></c:set>
 
 
@@ -25,7 +25,7 @@
         <c:when test="${not empty hosts}">
             <l:tableWithHighlighting className="webSshHosts" highlightImmediately="true">
                 <tr class="header">
-                    <th colspan="3">Configured hosts</th>
+                    <th colspan="4">Configured hosts</th>
                 </tr>
                 <c:forEach var="host" items="${hosts}">
                     <%--<c:set var="onclick">BS.AgentPush.updateHost(event, '<bs:forJs>${pr.id}</bs:forJs>');</c:set>--%>
@@ -35,6 +35,14 @@
                                 <%--<c:if test="${not empty pr.description}">--%>
                                 <%--<span style="color: #707070">(${pr.description})</span>--%>
                                 <%--</c:if>--%>
+                        </td>
+                        <td class="highlight edit">
+                            <a href="webSshShell.html?id=${host.id}"
+                                <%--<a href="#"--%>
+                                <%--onclick="return WebSshShell.createShell(event, 'id=${host.id}'); return false"--%>
+                                    >
+                                connect
+                            </a>
                         </td>
                         <td class="highlight edit">
                             <a href="#"
@@ -63,6 +71,8 @@
             Add new host
         </forms:addButton>
     </p>
+
+    <div id="terminal"></div>
 
     <bs:modalDialog
             formId="${formId}"
