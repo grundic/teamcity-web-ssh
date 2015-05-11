@@ -2,11 +2,8 @@ package ru.mail.teamcity.ssh.task;
 
 import org.atmosphere.cpr.AtmosphereResponse;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URLEncoder;
 
 /**
  * User: g.chernyshev
@@ -23,35 +20,29 @@ public class ShellOutputProcessor implements Runnable {
     public ShellOutputProcessor(InputStream outFromChannel, AtmosphereResponse response) {
         this.outFromChannel = outFromChannel;
         this.response = response;
+        response.setContentType("application/octet-stream");
     }
 
     public void run() {
         System.out.println("Starting thread " + this);
-        InputStreamReader isr = new InputStreamReader(outFromChannel);
-        BufferedReader reader = new BufferedReader(isr, 4096);
 
-
-        char[] chars = new char[1024];
-        synchronized (isr) { // TODO -- is this redundant?
-            try {
-                int count;
-//                while ((count = isr.read(chars)) != -1) {
-                while ((count = reader.read(chars)) != -1) {
-                    if (!running) {
-                        break;
-                    }
-                    String chunk = new String(chars, 0, count);
-                    response.write(URLEncoder.encode(chunk, "UTF-8").replace("+", "%20"));
-
-                    System.out.println("Count: " + count);
-                    System.out.println("Chunk: " + chunk);
-                    Thread.sleep(50);
+        byte[] buff = new byte[1024]; // TODO hardcoded constant
+        try {
+            int count;
+            while ((count = outFromChannel.read(buff)) != -1) {
+                if (!running) {
+                    break;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+//                String chunk = new String(buff, 0, count);
+                String chunk = printc(buff, 0, count);
+                //response.write(chunk);
+                response.write(buff, 0, count);
+                System.out.println("Count: " + count);
+                System.out.println("Chunk: " + chunk);
+                System.out.println("C type: " + response.getContentType());
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
