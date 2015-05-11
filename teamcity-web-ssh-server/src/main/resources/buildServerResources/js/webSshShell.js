@@ -37,7 +37,8 @@ var WebSshShell = {
         request.onMessage = function (response) {
             var message = response.responseBody;
             console.log(message);
-            term.write(message);
+            console.log(unescape(message));
+            term.write(unescape(message));
         };
 
         request.onClose = function (response) {
