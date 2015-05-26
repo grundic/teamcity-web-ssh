@@ -8,6 +8,10 @@
 <jsp:useBean id="hosts" scope="request"
              type="java.util.List<ru.mail.teamcity.ssh.config.HostBean>"/>
 
+<jsp:useBean id="connections" scope="request"
+             type="java.util.Collection<ru.mail.teamcity.ssh.shell.SshConnectionInfo>"/>
+
+
 <c:set var="controllerAjaxUrl"><c:url value="/webSshConfigController.html"/></c:set>
 <c:set var="formId"><c:url value="webSshHostForm"/></c:set>
 
@@ -72,7 +76,26 @@
         </forms:addButton>
     </p>
 
-    <div id="terminal"></div>
+    <c:choose>
+        <c:when test="${not empty connections}">
+            <div id="connections">
+                <l:tableWithHighlighting className="webSshHosts" highlightImmediately="true">
+                    <tr class="header">
+                        <th colspan="4">Established connections</th>
+                    </tr>
+                    <c:forEach var="connection" items="${connections}">
+                        <tr>
+                            <td>${connection.channel.session.userName}@${connection.channel.session.host}:${connection.channel.session.port}</td>
+                        </tr>
+                    </c:forEach>
+
+                </l:tableWithHighlighting>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <p>There is no established connections.</p>
+        </c:otherwise>
+    </c:choose>
 
     <bs:modalDialog
             formId="${formId}"

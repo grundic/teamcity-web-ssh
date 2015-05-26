@@ -2,7 +2,7 @@ package ru.mail.teamcity.ssh.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.JSchException;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.util.SessionUser;
@@ -15,7 +15,8 @@ import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.teamcity.ssh.config.ConfigHelper;
 import ru.mail.teamcity.ssh.config.HostBean;
-import ru.mail.teamcity.ssh.task.ShellOutputProcessor;
+import ru.mail.teamcity.ssh.shell.ShellManager;
+import ru.mail.teamcity.ssh.shell.SshConnectionInfo;
 
 import javax.xml.bind.JAXBException;
 import java.io.BufferedReader;
@@ -24,7 +25,6 @@ import java.io.PrintStream;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * User: g.chernyshev
@@ -32,8 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Time: 01:27
  */
 public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
-
-    private final ConcurrentHashMap<String, SshConnectionInfo> shells = new ConcurrentHashMap<String, SshConnectionInfo>();
 
     @NotNull
     private final ServerPaths serverPaths;
@@ -63,26 +61,10 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
             return;
         }
 
-        System.out.println("onOpen has triggered.");
-
-        JSch jsch = new JSch();
         try {
-            Session sshSession = jsch.getSession(host.getLogin(), host.getHost(), host.getPort());
-            sshSession.setPassword(host.getPassword());
-            sshSession.setConfig("StrictHostKeyChecking", "no");
-
-            sshSession.connect(30000);
-            Channel shellChannel = sshSession.openChannel("shell");
-            ((ChannelShell) shellChannel).setPtyType("xterm");
-
-            ShellOutputProcessor runnable = new ShellOutputProcessor(shellChannel.getInputStream(), resource);
-            Thread thread = new Thread(runnable);
-            thread.start();
-
-            shellChannel.connect();
-
-            shells.put(resource.uuid(), new SshConnectionInfo(shellChannel, runnable, thread));
+            ShellManager.createSshConnection(user, host, resource);
         } catch (JSchException e) {
+            // TODO: handle exception
             e.printStackTrace();
         }
 
@@ -110,13 +92,14 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
             Type type = new TypeToken<Map<String, String>>() {
             }.getType();
             Map<String, String> jsonRoot = new Gson().fromJson(message, type);
+            SUser user = SessionUser.getUser(response.resource().getRequest());
 
             String stdin = jsonRoot.get("stdin");
             String uuid = response.resource().uuid();
             if (null == uuid) {
                 return;
             }
-            SshConnectionInfo connectionInfo = shells.get(uuid);
+            SshConnectionInfo connectionInfo = ShellManager.get(user, response.resource().uuid());
             if (null == connectionInfo) {
                 return;
             }
@@ -159,56 +142,11 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
     }
 
     private void close(AtmosphereResource resource) {
+        SUser user = SessionUser.getUser(resource.getRequest());
         String uuid = resource.uuid();
         if (null == uuid) {
             return;
         }
-        SshConnectionInfo connectionInfo = shells.get(uuid);
-        if (null == connectionInfo) {
-            return;
-        }
-
-        stopThread(connectionInfo.thread, connectionInfo.runnable);
-        shells.remove(uuid);
-    }
-
-    private void stopThread(Thread thread, ShellOutputProcessor runnable) {
-        System.out.println("Stopping runnable");
-        if (thread != null) {
-            runnable.terminate();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Thread successfully stopped.");
-        }
-    }
-
-
-    private class SshConnectionInfo {
-        private final Channel channel;
-        private final ShellOutputProcessor runnable;
-        private final Thread thread;
-
-        private SshConnectionInfo(Channel channel, ShellOutputProcessor runnable, Thread thread) {
-            this.channel = channel;
-            this.runnable = runnable;
-            this.thread = thread;
-
-        }
-
-        public Channel getChannel() {
-            return channel;
-        }
-
-        public ShellOutputProcessor getRunnable() {
-            return runnable;
-        }
-
-        public Thread getThread() {
-            return thread;
-        }
-
+        ShellManager.terminate(user, uuid);
     }
 }

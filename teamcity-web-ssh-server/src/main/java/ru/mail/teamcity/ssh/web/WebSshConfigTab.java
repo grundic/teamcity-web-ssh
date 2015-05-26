@@ -10,6 +10,7 @@ import jetbrains.buildServer.web.util.SessionUser;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.teamcity.ssh.AppConfiguration;
 import ru.mail.teamcity.ssh.config.ConfigHelper;
+import ru.mail.teamcity.ssh.shell.ShellManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBException;
@@ -51,6 +52,7 @@ public class WebSshConfigTab extends SimpleCustomTab {
         SUser user = SessionUser.getUser(httpServletRequest);
         try {
             model.put("hosts", ConfigHelper.hosts(serverPaths, user));
+            model.put("connections", ShellManager.getUserConnections(user));
         } catch (JAXBException e) {
             // TODO: add error to client side
             e.printStackTrace();

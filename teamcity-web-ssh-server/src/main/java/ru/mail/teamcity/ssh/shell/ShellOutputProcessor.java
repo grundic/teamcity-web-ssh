@@ -1,4 +1,4 @@
-package ru.mail.teamcity.ssh.task;
+package ru.mail.teamcity.ssh.shell;
 
 import com.google.gson.Gson;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -11,7 +11,7 @@ import java.io.InputStream;
  * Date: 29/04/15
  * Time: 00:27
  */
-public class ShellOutputProcessor implements Runnable {
+public class ShellOutputProcessor extends Thread {
 
     InputStream outFromChannel;
     AtmosphereResource resource;
