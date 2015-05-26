@@ -3,31 +3,29 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="/include.jsp" %>
 
-<bs:externalPage/>
+<bs:page>
+<jsp:attribute name="head_include">
+    <bs:linkScript>
+        ${teamcityPluginResourcesPath}js/webSshShell.js
+        ${teamcityPluginResourcesPath}lib/term.js
+    </bs:linkScript>
 
-<bs:linkScript>
-    ${teamcityPluginResourcesPath}js/webSshShell.js
-    ${teamcityPluginResourcesPath}lib/term.js
-</bs:linkScript>
-
-
-<script type="text/javascript">
+    <script type="text/javascript">
     (function (event) {
-        WebSshShell.createShell(event, 'id=${id}');
+        $j(document).ready(function (event) {
+            $j(document).unbind("keydown");
+            WebSshShell.createShell(event, 'id=${id}');
 
-//        $j(document).keypress(function (e) {
-//            var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
-//            console.log(keyCode);
-//            console.log(String.fromCharCode(keyCode));
-//        });
-//
-//        $j(document).keydown(function (e) {
-//            var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
-//            console.log(keyCode);
-//            console.log(String.fromCharCode(keyCode));
-//        });
+        });
     })();
-</script>
+    </script>
+    </jsp:attribute>
 
+    <jsp:attribute name="body_include">
+        <input type="text" id="cmd">
 
-<div id="terminal"></div>
+        <div id="command" tabindex="1" style="background-color: crimson">
+            <div id="terminal"></div>
+        </div>
+    </jsp:attribute>
+</bs:page>

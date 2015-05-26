@@ -45,7 +45,6 @@ public class WebSshShellController extends BaseController {
         httpServletRequest.setAttribute("org.apache.catalina.ASYNC_SUPPORTED", Boolean.TRUE);
         atmosphereFramework.doCometSupport(AtmosphereRequest.wrap(httpServletRequest), AtmosphereResponse.wrap(httpServletResponse));
         return null;
-
     }
 
     private AtmosphereFramework createAtmosphereFramework(@NotNull SshUpdateHandler sshUpdateHandler) {

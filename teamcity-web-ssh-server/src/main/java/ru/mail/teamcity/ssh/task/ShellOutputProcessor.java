@@ -1,7 +1,7 @@
 package ru.mail.teamcity.ssh.task;
 
 import com.google.gson.Gson;
-import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.cpr.AtmosphereResource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,19 +14,19 @@ import java.io.InputStream;
 public class ShellOutputProcessor implements Runnable {
 
     InputStream outFromChannel;
-    AtmosphereResponse response;
+    AtmosphereResource resource;
     private volatile boolean running = true;
 
 
-    public ShellOutputProcessor(InputStream outFromChannel, AtmosphereResponse response) {
+    public ShellOutputProcessor(InputStream outFromChannel, AtmosphereResource resource) {
         this.outFromChannel = outFromChannel;
-        this.response = response;
+        this.resource = resource;
     }
 
     public void run() {
         System.out.println("Starting thread " + this);
 
-        byte[] buff = new byte[1024];
+        byte[] buff = new byte[5120];
         int count;
         try {
             while ((count = outFromChannel.read(buff)) != -1) {
@@ -34,7 +34,7 @@ public class ShellOutputProcessor implements Runnable {
                     break;
                 }
                 String chunk = new String(buff, 0, count);
-                response.write(new Gson().toJson(chunk));
+                resource.write(new Gson().toJson(chunk));
             }
         } catch (IOException e) {
             e.printStackTrace();

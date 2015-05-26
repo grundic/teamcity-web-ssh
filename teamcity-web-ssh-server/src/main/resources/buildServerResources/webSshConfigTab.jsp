@@ -37,7 +37,7 @@
                                 <%--</c:if>--%>
                         </td>
                         <td class="highlight edit">
-                            <a href="webSshShell.html?id=${host.id}"
+                            <a href="webSshShell.html?id=${host.id}" target="_blank"
                                 <%--<a href="#"--%>
                                 <%--onclick="return WebSshShell.createShell(event, 'id=${host.id}'); return false"--%>
                                     >

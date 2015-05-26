@@ -28,7 +28,6 @@ public class WebSshShellPage extends BaseController {
     ) {
         this.pluginDescriptor = pluginDescriptor;
         webControllerManager.registerController("/webSshShell.html", this);
-
     }
 
     @Nullable

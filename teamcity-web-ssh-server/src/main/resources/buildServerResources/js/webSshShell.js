@@ -1,6 +1,8 @@
 "use strict";
 
 var WebSshShell = {
+    terminals: {},
+
     createShell: function (event, params) {
         var subSocket;
         var socket = atmosphere;
@@ -22,16 +24,16 @@ var WebSshShell = {
         };
 
         request.onClientTimeout = function (r) {
-
+            console.log("'onClientTimeout' called!");
         };
 
         request.onReopen = function (response) {
-
+            console.log("'onReopen' called!");
         };
 
         // For demonstration of how you can customize the fallbackTransport using the onTransportFailure function
         request.onTransportFailure = function (errorMsg, request) {
-
+            console.log("'onTransportFailure' called!");
         };
 
         request.onMessage = function (response) {
@@ -44,15 +46,15 @@ var WebSshShell = {
         };
 
         request.onError = function (response) {
+            console.log("'onError' called!");
         };
 
         request.onReconnect = function (request, response) {
-
+            console.log("'onReconnect' called!");
         };
 
         subSocket = socket.subscribe(request);
 
-        console.log("Preparing to create ssh terminal");
         var term = new Terminal({
             cols: 80,
             rows: 24,
@@ -65,10 +67,7 @@ var WebSshShell = {
         });
 
         term.on('data', function (data) {
-            //console.log(data);
-            //term.write(data);
-            //socket.emit('data', data);
-            subSocket.push(atmosphere.util.stringifyJSON({'stdin': data}));
+            subSocket.push(atmosphere.util.stringifyJSON({'stdin': data, 'uuid': this.uuid}));
         });
 
         term.on('title', function (title) {
@@ -77,5 +76,17 @@ var WebSshShell = {
 
         term.open($j("#" + shellId)[0]);
         term.write('\x1b[31mWelcome to term.js!\x1b[m\r\n');
+
+        $j('#cmd').bind('keydown', function (e) {
+            console.log('keydown');
+            Terminal.focus = term;
+            Terminal.focus.keyDown(e);
+        });
+
+        $j('#cmd').bind('keypress', function (e) {
+            console.log('keypress');
+            Terminal.focus = term;
+            Terminal.focus.keyPress(e);
+        });
     }
 };
