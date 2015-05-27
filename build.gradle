@@ -1,45 +1,44 @@
-
 ext {
-  teamCityVersion = '9.0.1'
+    teamCityVersion = '9.0.1'
 }
 allprojects {
-  apply plugin: 'java'
-  apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'idea'
 
-  configurations {
-      provided
-      compile.extendsFrom provided
-  }
-
-  sourceSets {
-      main { compileClasspath += [configurations.provided] }
-  }
-
-  idea {
-      module {
-          scopes.PROVIDED.plus += [configurations.provided]
-      }
-  }
-
-  repositories {
-    mavenCentral()
-    maven {
-      url "http://repository.jetbrains.com/all"
+    configurations {
+        provided
+        compile.extendsFrom provided
     }
-  }
+
+    sourceSets {
+        main { compileClasspath += [configurations.provided] }
+    }
+
+    idea {
+        module {
+            scopes.PROVIDED.plus += [configurations.provided]
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "http://repository.jetbrains.com/all"
+        }
+    }
 }
 
-project(':teamcity-web-ssh-server'){
-  dependencies {
-    provided("org.jetbrains.teamcity:server-api:$teamCityVersion")
-    provided("org.jetbrains.teamcity:server-web-api:$teamCityVersion")
-    testRuntime("org.jetbrains.teamcity:tests-support:$teamCityVersion")
+project(':teamcity-web-ssh-server') {
+    dependencies {
+        provided("org.jetbrains.teamcity:server-api:$teamCityVersion")
+        provided("org.jetbrains.teamcity:server-web-api:$teamCityVersion")
+        testRuntime("org.jetbrains.teamcity:tests-support:$teamCityVersion")
 
-    provided("org.atmosphere:atmosphere-runtime:2.2.4")
-    compile("com.jcraft:jsch:0.1.52")
-  }
+        provided("org.atmosphere:atmosphere-runtime:2.2.4")
+        compile("com.jcraft:jsch:0.1.52")
+    }
 }
 
 dependencies {
-  compile project(':teamcity-web-ssh-server')
+    compile project(':teamcity-web-ssh-server')
 }
