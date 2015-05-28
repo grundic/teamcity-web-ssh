@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 ext {
     teamCityVersion = '9.0.1'
     localProperties = new Properties()
@@ -7,6 +9,9 @@ ext {
 allprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
+
+    group = 'ru.mail.teamcity'
+    version = '0.0.1-SNAPSHOT'
 
     configurations {
         provided
@@ -42,7 +47,9 @@ project(':teamcity-web-ssh-server') {
     }
 
     task createPluginBundle(type: Zip, dependsOn: build) {
-        from "${rootDir}/teamcity-plugin.xml"
+        from("${rootDir}/teamcity-plugin.xml") {
+            filter(ReplaceTokens, tokens: [Version: project.version])
+        }
 
         from(jar) {
             into 'server'
