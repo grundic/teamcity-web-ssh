@@ -1,5 +1,7 @@
 ext {
     teamCityVersion = '9.0.1'
+    localProperties = new Properties()
+    localProperties.load(new FileInputStream("${rootDir}/local.properties"))
 }
 
 allprojects {
@@ -40,7 +42,6 @@ project(':teamcity-web-ssh-server') {
     }
 
     task createPluginBundle(type: Zip, dependsOn: build) {
-
         from "${rootDir}/teamcity-plugin.xml"
 
         from(jar) {
@@ -54,6 +55,18 @@ project(':teamcity-web-ssh-server') {
                 }
             }
         }
+    }
+
+    task copyPluginBundle(type: Copy, dependsOn: createPluginBundle) {
+        def teamcityDataPath = localProperties.get("teamcityDataPath")
+        if (null == teamcityDataPath) {
+            logger.error('Please, configure location of Teamcity data directory.')
+            return
+        }
+
+        from "${buildDir}/distributions"
+        into "${teamcityDataPath}/plugins"
+        include "*.zip"
     }
 }
 
