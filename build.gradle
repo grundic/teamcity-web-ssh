@@ -1,13 +1,13 @@
 ext {
     teamCityVersion = '9.0.1'
 }
+
 allprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
 
     configurations {
         provided
-        compile.extendsFrom provided
     }
 
     sourceSets {
@@ -30,12 +30,30 @@ allprojects {
 
 project(':teamcity-web-ssh-server') {
     dependencies {
-        provided("org.jetbrains.teamcity:server-api:$teamCityVersion")
-        provided("org.jetbrains.teamcity:server-web-api:$teamCityVersion")
-        testRuntime("org.jetbrains.teamcity:tests-support:$teamCityVersion")
+        provided "org.jetbrains.teamcity:server-api:$teamCityVersion"
+        provided "org.jetbrains.teamcity:server-web-api:$teamCityVersion"
+        testRuntime "org.jetbrains.teamcity:tests-support:$teamCityVersion"
 
-        provided("org.atmosphere:atmosphere-runtime:2.2.4")
-        compile("com.jcraft:jsch:0.1.52")
+        provided "org.atmosphere:atmosphere-runtime:2.2.4"
+        compile "com.jcraft:jsch:0.1.52"
+        compile "com.google.code.gson:gson:2.3.1"
+    }
+
+    task createPluginBundle(type: Zip, dependsOn: build) {
+
+        from "${rootDir}/teamcity-plugin.xml"
+
+        from(jar) {
+            into 'server'
+        }
+
+        configurations.compile.resolvedConfiguration.firstLevelModuleDependencies.each {
+            it.allModuleArtifacts.each {
+                from(it.getFile().getPath()) {
+                    into 'server'
+                }
+            }
+        }
     }
 }
 
