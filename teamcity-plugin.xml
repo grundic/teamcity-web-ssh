@@ -2,14 +2,14 @@
 <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:shemas-jetbrains-com:teamcity-plugin-v1-xml">
   <info>
     <name>teamcity-web-ssh</name>
-    <display-name>teamcity-web-ssh</display-name>
+    <display-name>Web Ssh</display-name>
     <version>@Version@</version>
-    <description>Plugin description</description>
+    <description>Plugin for connecting to ssh via web ssh directly from Teamcity</description>
     <download-url>Plugin download URL</download-url>
-    <email>Plugin author e-mail</email>
+    <email>systray@yandex.ru</email>
     <vendor>
-      <name>@VendorName@</name>
-      <url>@VendorURL@</url>
+      <name>Grigory Chernyshev [mail.ru]</name>
+      <url>http://mail.ru</url>
       <logo>Plugin vendor logo URL</logo>
     </vendor>
   </info>
