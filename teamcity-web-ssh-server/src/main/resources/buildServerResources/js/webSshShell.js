@@ -3,7 +3,7 @@
 var WebSshShell = {
     terminals: {},
 
-    createShell: function (event, params) {
+    createShell: function (event, query) {
         var subSocket;
         var socket = atmosphere;
         var transport = 'websocket';
@@ -11,7 +11,7 @@ var WebSshShell = {
         var shellId = 'terminal';
 
         var request = {
-            url: base_uri + controllerUrl + '?' + params,
+            url: base_uri + controllerUrl + '?' + query,
             contentType: "application/json",
             logLevel: 'debug',
             transport: transport,

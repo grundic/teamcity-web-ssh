@@ -14,8 +14,7 @@
     (function (event) {
         $j(document).ready(function (event) {
             $j(document).unbind("keydown");
-            WebSshShell.createShell(event, 'id=${id}');
-
+            WebSshShell.createShell(event, "${queryString}");
         });
     })();
     </script>

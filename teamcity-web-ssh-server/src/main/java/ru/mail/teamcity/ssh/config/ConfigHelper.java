@@ -14,6 +14,8 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -121,6 +123,28 @@ public class ConfigHelper {
             return null;
         }
         return read(hostConfig);
+    }
+
+    @Nullable
+    public static HostBean findHostByIp(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String ip) throws JAXBException {
+        InetAddress requiredIp;
+
+        try {
+            requiredIp = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            return null;
+        }
+        for (HostBean host : hosts(serverPaths, user)) {
+            try {
+                InetAddress hostIp = InetAddress.getByName(host.getHost());
+                if (hostIp.getHostAddress().equalsIgnoreCase(requiredIp.getHostAddress())) {
+                    return host;
+                }
+            } catch (UnknownHostException e) {
+                // skip it
+            }
+        }
+        return null;
     }
 
     /**

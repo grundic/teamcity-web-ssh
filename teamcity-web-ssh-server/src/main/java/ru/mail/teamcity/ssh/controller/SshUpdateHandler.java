@@ -49,15 +49,28 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
     }
 
     public void onOpen(AtmosphereResource resource) throws IOException {
-
-        String id = resource.getRequest().getParameter("id");
         SUser user = SessionUser.getUser(resource.getRequest());
         HostBean host;
+
+        String id = resource.getRequest().getParameter("id");
+        String ip = resource.getRequest().getParameter("ip");
+
         try {
-            host = ConfigHelper.load(serverPaths, user, id);
+            if (null != id && StringUtils.isNotEmpty(id)) {
+                host = ConfigHelper.load(serverPaths, user, id);
+            } else if (null != ip && StringUtils.isNotEmpty(ip)) {
+                host = ConfigHelper.findHostByIp(serverPaths, user, ip);
+            } else {
+                // TODO: handle error here
+                return;
+            }
         } catch (JAXBException e) {
             // TODO: handle exception
             e.printStackTrace();
+            return;
+        }
+        if (null == host) {
+            // TODO: handle error here
             return;
         }
 
