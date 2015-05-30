@@ -7,4 +7,5 @@
     <bean class="ru.mail.teamcity.ssh.controller.WebSshShellController"/>
     <bean class="ru.mail.teamcity.ssh.controller.SshUpdateHandler"/>
     <bean class="ru.mail.teamcity.ssh.web.WebSshShellPage"/>
+    <bean class="ru.mail.teamcity.ssh.web.AgentWebSshExtension"/>
 </beans>
