@@ -32,19 +32,12 @@
                     <th colspan="4">Configured hosts</th>
                 </tr>
                 <c:forEach var="host" items="${hosts}">
-                    <%--<c:set var="onclick">BS.AgentPush.updateHost(event, '<bs:forJs>${pr.id}</bs:forJs>');</c:set>--%>
                     <tr>
-                        <td class="highlight" title="<DESCRIPTION>" onclick="">
-                                ${host.host}:${host.port}
-                                <%--<c:if test="${not empty pr.description}">--%>
-                                <%--<span style="color: #707070">(${pr.description})</span>--%>
-                                <%--</c:if>--%>
+                        <td class="highlight">
+                                ${host.login}@${host.host}:${host.port}
                         </td>
                         <td class="highlight edit">
-                            <a href="webSshShell.html?id=${host.id}" target="_blank"
-                                <%--<a href="#"--%>
-                                <%--onclick="return WebSshShell.createShell(event, 'id=${host.id}'); return false"--%>
-                                    >
+                            <a href="webSshShell.html?id=${host.id}" target="_blank">
                                 connect
                             </a>
                         </td>

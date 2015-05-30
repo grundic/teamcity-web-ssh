@@ -21,8 +21,6 @@
     </jsp:attribute>
 
     <jsp:attribute name="body_include">
-        <input type="text" id="cmd">
-
         <div id="command" tabindex="1" style="background-color: crimson">
             <div id="terminal"></div>
         </div>

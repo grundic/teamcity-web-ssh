@@ -9,6 +9,7 @@ var WebSshShell = {
         var transport = 'websocket';
         var controllerUrl = '/webSsh.html';
         var shellId = 'terminal';
+        var term;
 
         var request = {
             url: base_uri + controllerUrl + '?' + query,
@@ -20,7 +21,26 @@ var WebSshShell = {
         };
 
         request.onOpen = function (response) {
+            term = new Terminal({
+                cols: 80,
+                rows: 24,
+                //screenKeys: true,
+                //useStyle: true
+                screenKeys: false,
+                useStyle: true,
+                cursorBlink: true,
+                convertEol: true
+            });
 
+            term.on('data', function (data) {
+                subSocket.push(atmosphere.util.stringifyJSON({'stdin': data, 'uuid': this.uuid}));
+            });
+
+            term.on('title', function (title) {
+                document.title = title;
+            });
+
+            term.open($(shellId));
         };
 
         request.onClientTimeout = function (r) {
@@ -54,39 +74,5 @@ var WebSshShell = {
         };
 
         subSocket = socket.subscribe(request);
-
-        var term = new Terminal({
-            cols: 80,
-            rows: 24,
-            //screenKeys: true,
-            //useStyle: true
-            screenKeys: false,
-            useStyle: true,
-            cursorBlink: true,
-            convertEol: true
-        });
-
-        term.on('data', function (data) {
-            subSocket.push(atmosphere.util.stringifyJSON({'stdin': data, 'uuid': this.uuid}));
-        });
-
-        term.on('title', function (title) {
-            document.title = title;
-        });
-
-        term.open($j("#" + shellId)[0]);
-        term.write('\x1b[31mWelcome to term.js!\x1b[m\r\n');
-
-        $j('#cmd').bind('keydown', function (e) {
-            console.log('keydown');
-            Terminal.focus = term;
-            Terminal.focus.keyDown(e);
-        });
-
-        $j('#cmd').bind('keypress', function (e) {
-            console.log('keypress');
-            Terminal.focus = term;
-            Terminal.focus.keyPress(e);
-        });
     }
 };
