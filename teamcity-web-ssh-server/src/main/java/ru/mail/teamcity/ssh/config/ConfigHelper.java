@@ -41,6 +41,9 @@ public class ConfigHelper {
                 if (EncryptUtil.isScrambled(host.getPassword())) {
                     host.setPassword(EncryptUtil.unscramble(host.getPassword()));
                 }
+                if (EncryptUtil.isScrambled(host.getPrivateKey())) {
+                    host.setPrivateKey(EncryptUtil.unscramble(host.getPrivateKey()));
+                }
                 return host;
             }
             return null;
@@ -50,6 +53,7 @@ public class ConfigHelper {
     private static void write(@NotNull final File file, @NotNull HostBean host) throws JAXBException {
         synchronized (getOrCreateLock(file)) {
             host.setPassword(EncryptUtil.scramble(host.getPassword()));
+            host.setPrivateKey(EncryptUtil.scramble(host.getPrivateKey()));
             JAXBContext context = JAXBContext.newInstance(HostBean.class);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
