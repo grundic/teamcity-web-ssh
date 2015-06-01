@@ -114,3 +114,9 @@
         </div>
     </bs:modalDialog>
 </div>
+
+<c:choose>
+    <c:when test="${not empty error}">
+        <div class="error"><c:out value="${error}"/></div>
+    </c:when>
+</c:choose>

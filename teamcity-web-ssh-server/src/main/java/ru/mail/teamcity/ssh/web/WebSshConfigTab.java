@@ -1,5 +1,6 @@
 package ru.mail.teamcity.ssh.web;
 
+import com.google.common.collect.Lists;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.openapi.PagePlaces;
@@ -10,10 +11,12 @@ import jetbrains.buildServer.web.util.SessionUser;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.teamcity.ssh.AppConfiguration;
 import ru.mail.teamcity.ssh.config.ConfigHelper;
+import ru.mail.teamcity.ssh.config.HostBean;
 import ru.mail.teamcity.ssh.shell.ShellManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,12 +53,15 @@ public class WebSshConfigTab extends SimpleCustomTab {
     @Override
     public void fillModel(@NotNull Map<String, Object> model, @NotNull HttpServletRequest httpServletRequest) {
         SUser user = SessionUser.getUser(httpServletRequest);
+        List<HostBean> hosts = Lists.newArrayList();
         try {
-            model.put("hosts", ConfigHelper.hosts(serverPaths, user));
-            model.put("connections", ShellManager.getUserConnections(user));
+            hosts = ConfigHelper.hosts(serverPaths, user);
         } catch (JAXBException e) {
-            // TODO: add error to client side
+            model.put("error", e.getCause().toString());
             e.printStackTrace();
         }
+
+        model.put("hosts", hosts);
+        model.put("connections", ShellManager.getUserConnections(user));
     }
 }
