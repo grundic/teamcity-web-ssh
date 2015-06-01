@@ -18,17 +18,10 @@ var WebSshShell = {
             transport: transport,
             trackMessageLength: true,
             reconnectOnServerError: false,
-            reconnectInterval: 5000
+            reconnect: false
         };
 
         request.onOpen = function (response) {
-            var message = response.responseBody;
-            var jsonMessage = atmosphere.util.parseJSON(message);
-            if (jsonMessage != null && jsonMessage['error'] != null){
-                alert(jsonMessage['error']);
-                return;
-            }
-
             term = new Terminal({
                 cols: 80,
                 rows: 24,
@@ -68,7 +61,12 @@ var WebSshShell = {
             var message = response.responseBody;
             var jsonMessage = atmosphere.util.parseJSON(message);
             if (jsonMessage != null && jsonMessage['error'] != null){
-                console.log(jsonMessage['error']);
+                WebSshShell.ErrorDialog.show(
+                    jsonMessage.error.title,
+                    '<p class="error">' + jsonMessage.error.content + '</p>'
+                );
+
+                subSocket.disconnect();
                 return;
             }
 

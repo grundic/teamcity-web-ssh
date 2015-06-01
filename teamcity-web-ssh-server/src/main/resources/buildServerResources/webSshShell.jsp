@@ -7,6 +7,7 @@
 <jsp:attribute name="head_include">
     <bs:linkScript>
         ${teamcityPluginResourcesPath}js/webSshShell.js
+        ${teamcityPluginResourcesPath}js/webSshShellErrorDialog.js
         ${teamcityPluginResourcesPath}lib/term.js
     </bs:linkScript>
 
@@ -24,5 +25,7 @@
         <div id="command" tabindex="1" style="background-color: crimson">
             <div id="terminal"></div>
         </div>
+
+        <div id="error" class="error"></div>
     </jsp:attribute>
 </bs:page>

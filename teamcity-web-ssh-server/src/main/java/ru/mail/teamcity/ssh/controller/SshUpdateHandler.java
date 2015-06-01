@@ -1,16 +1,12 @@
 package ru.mail.teamcity.ssh.controller;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jcraft.jsch.JSchException;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.util.SessionUser;
-import org.apache.commons.collections.MultiMap;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
@@ -18,7 +14,6 @@ import org.atmosphere.cpr.AtmosphereResourceImpl;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.MediaType;
 import ru.mail.teamcity.ssh.config.ConfigHelper;
 import ru.mail.teamcity.ssh.config.HostBean;
 import ru.mail.teamcity.ssh.shell.ShellManager;
@@ -29,7 +24,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,29 +63,20 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
                 host = ConfigHelper.findHostByIp(serverPaths, user, ip);
             }
         } catch (JAXBException e) {
-            // TODO: handle exception
+            sendError(resource, "Xml error", "Looks, like you xml is invalid:" + e.getMessage());
             e.printStackTrace();
             return;
         }
         if (null == host) {
-//            resource.getResponse().setContentType(MediaType.APPLICATION_JSON.getType());
-//            resource.getResponse().setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-//            resource.getResponse().destroy();
-//            resource.getResponse().write(new Gson().toJson("This is my tesr"));
-//            resource.write("Websocket endpoint not found");
-//            resource.write("{\"firstName\":\"John\", \"lastName\":\"Doe\"}");
-            resource.getResponse().sendError(507, "{\"firstName\":\"John\", \"lastName\":\"Doe\"}");
-//            Map<String,String> error = ImmutableMap.of("error", "Host location failed! Please, make sure 'id' or 'ip' parameter is provided and is correct.");
-//            resource.write(new Gson().toJson(error));
-//            resource.getResponse().sendError(501, new Gson().toJson("Dummy error"));
-            resource.close();
+            sendError(resource, "Can't get host! Please, check parameters 'id' or 'ip' are correct.");
+            resource.getResponse().close();
             return;
         }
 
         try {
             ShellManager.createSshConnection(user, host, resource);
         } catch (JSchException e) {
-            // TODO: handle exception
+            sendError(resource, "Ssh error", "Error establishing connection:" + e.getMessage());
             e.printStackTrace();
         }
 
@@ -175,5 +160,16 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
             return;
         }
         ShellManager.terminate(user, uuid);
+    }
+
+    private void sendError(@NotNull AtmosphereResource resource, @NotNull String title, @NotNull String content) {
+        Map<String, String> error = ImmutableMap.of("title", title, "content", content);
+        Map<String, Map<String, String>> payload = ImmutableMap.of("error", error);
+
+        resource.write(new Gson().toJson(payload));
+    }
+
+    private void sendError(@NotNull AtmosphereResource resource, @NotNull String content) {
+        sendError(resource, "Something went wrong", content);
     }
 }
