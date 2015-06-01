@@ -53,6 +53,19 @@
             </td>
         </tr>
 
+        <tr id="privateKeyContainer">
+            <th><label for="privateKey">Private key:</label></th>
+            <td>
+                <textarea
+                        name="privateKey"
+                        style="width:25em;"
+                        readonly="true"
+                        onfocus="this.removeAttribute('readonly');"
+                        rows="7">${bean.privateKey}</textarea>
+                <span class="error" id="errorPrivateKey"></span>
+            </td>
+        </tr>
+
     </table>
 
     <span class="error" id="errorVarious"></span>

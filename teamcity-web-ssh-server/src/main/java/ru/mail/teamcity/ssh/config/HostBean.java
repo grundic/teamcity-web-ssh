@@ -35,6 +35,9 @@ public class HostBean extends RememberState {
 
     String encryptedPassword = "";
 
+    @StateField
+    String privateKey = "";
+
     public UUID getId() {
         return id;
     }
@@ -82,5 +85,13 @@ public class HostBean extends RememberState {
 
     public void setEncryptedPassword(String encryptedPassword) {
         this.encryptedPassword = encryptedPassword;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 }
