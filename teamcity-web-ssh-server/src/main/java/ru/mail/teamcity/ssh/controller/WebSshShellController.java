@@ -59,6 +59,8 @@ public class WebSshShellController extends BaseController {
 
         atmosphereFramework.addAtmosphereHandler("/", sshUpdateHandler, interceptors);
 
+        atmosphereFramework.getAtmosphereConfig().getBroadcasterFactory().lookup("MyBroadcaster", true);
+
         atmosphereFramework.init();
         return atmosphereFramework;
     }
