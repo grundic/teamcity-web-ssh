@@ -1,6 +1,5 @@
 package ru.mail.teamcity.ssh.config;
 
-import jetbrains.buildServer.controllers.RememberState;
 import jetbrains.buildServer.controllers.StateField;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -13,13 +12,15 @@ import java.util.UUID;
  */
 @SuppressWarnings("UnusedDeclaration")
 @XmlRootElement
-public class HostBean extends RememberState {
+public class HostBean extends AbstractBean {
 
     public HostBean() {
         // empty constructor for JAXB
     }
 
-    UUID id = null;
+    UUID presetId = null;
+
+    PresetBean preset = null;
 
     @StateField
     String host = "";
@@ -27,23 +28,21 @@ public class HostBean extends RememberState {
     @StateField
     int port = 22;
 
-    @StateField
-    String login = "";
-
-    @StateField
-    String password = "";
-
-    String encryptedPassword = "";
-
-    @StateField
-    String privateKey = "";
-
-    public UUID getId() {
-        return id;
+    public UUID getPresetId() {
+        return presetId;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setPresetId(UUID presetId) {
+        this.presetId = presetId;
+    }
+
+    @XmlTransient
+    public PresetBean getPreset() {
+        return preset;
+    }
+
+    public void setPreset(PresetBean preset) {
+        this.preset = preset;
     }
 
     public String getHost() {
@@ -60,38 +59,5 @@ public class HostBean extends RememberState {
 
     public void setPort(int port) {
         this.port = port;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @XmlTransient
-    public String getEncryptedPassword() {
-        return encryptedPassword;
-    }
-
-    public void setEncryptedPassword(String encryptedPassword) {
-        this.encryptedPassword = encryptedPassword;
-    }
-
-    public String getPrivateKey() {
-        return privateKey;
-    }
-
-    public void setPrivateKey(String privateKey) {
-        this.privateKey = privateKey;
     }
 }

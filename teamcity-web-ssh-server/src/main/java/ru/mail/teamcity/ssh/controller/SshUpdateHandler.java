@@ -14,8 +14,8 @@ import org.atmosphere.cpr.AtmosphereResourceImpl;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.jetbrains.annotations.NotNull;
-import ru.mail.teamcity.ssh.config.ConfigHelper;
 import ru.mail.teamcity.ssh.config.HostBean;
+import ru.mail.teamcity.ssh.config.HostManager;
 import ru.mail.teamcity.ssh.shell.ShellManager;
 import ru.mail.teamcity.ssh.shell.SshConnectionInfo;
 
@@ -58,9 +58,9 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
 
         try {
             if (null != id && StringUtils.isNotEmpty(id)) {
-                host = ConfigHelper.load(serverPaths, user, id);
+                host = HostManager.load(serverPaths, user, id);
             } else if (null != ip && StringUtils.isNotEmpty(ip)) {
-                host = ConfigHelper.findHostByIp(serverPaths, user, ip);
+                host = HostManager.findHostByIp(serverPaths, user, ip);
             }
         } catch (JAXBException e) {
             sendError(resource, "Xml error", "Looks, like you xml is invalid:" + e.getMessage());

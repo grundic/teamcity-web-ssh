@@ -13,8 +13,8 @@ import jetbrains.buildServer.web.util.SessionUser;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
-import ru.mail.teamcity.ssh.config.ConfigHelper;
 import ru.mail.teamcity.ssh.config.HostBean;
+import ru.mail.teamcity.ssh.config.HostManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +62,7 @@ public class WebSshConfigController extends BaseFormXmlController {
         String id = httpServletRequest.getParameter("id");
         if (null != id) {
             try {
-                bean = ConfigHelper.load(serverPaths, user, id);
+                bean = HostManager.load(serverPaths, user, id);
                 String encryptedPassword = RSACipher.encryptDataForWeb(bean.getPassword());
                 bean.setEncryptedPassword(encryptedPassword);
                 bean.setPassword("");
@@ -94,7 +94,7 @@ public class WebSshConfigController extends BaseFormXmlController {
         }
         SUser user = SessionUser.getUser(httpServletRequest);
 
-        ConfigHelper.delete(serverPaths, user, id);
+        HostManager.delete(serverPaths, user, id);
     }
 
     private void save(@NotNull HttpServletRequest httpServletRequest, @NotNull Element element) {
@@ -111,7 +111,7 @@ public class WebSshConfigController extends BaseFormXmlController {
 
         SUser user = SessionUser.getUser(httpServletRequest);
         try {
-            ConfigHelper.save(serverPaths, user, bean);
+            HostManager.save(serverPaths, user, bean);
         } catch (IOException e) {
             errors.addError("ioException", e.getMessage());
             writeErrors(element, errors);

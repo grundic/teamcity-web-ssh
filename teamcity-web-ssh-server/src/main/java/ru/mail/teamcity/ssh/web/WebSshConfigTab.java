@@ -10,8 +10,8 @@ import jetbrains.buildServer.web.openapi.SimpleCustomTab;
 import jetbrains.buildServer.web.util.SessionUser;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.teamcity.ssh.AppConfiguration;
-import ru.mail.teamcity.ssh.config.ConfigHelper;
 import ru.mail.teamcity.ssh.config.HostBean;
+import ru.mail.teamcity.ssh.config.HostManager;
 import ru.mail.teamcity.ssh.shell.ShellManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +55,7 @@ public class WebSshConfigTab extends SimpleCustomTab {
         SUser user = SessionUser.getUser(httpServletRequest);
         List<HostBean> hosts = Lists.newArrayList();
         try {
-            hosts = ConfigHelper.hosts(serverPaths, user);
+            hosts = HostManager.hosts(serverPaths, user);
         } catch (JAXBException e) {
             model.put("error", e.getCause().toString());
             e.printStackTrace();
