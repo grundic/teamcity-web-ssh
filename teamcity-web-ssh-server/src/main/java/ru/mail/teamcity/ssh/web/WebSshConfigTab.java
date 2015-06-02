@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import ru.mail.teamcity.ssh.AppConfiguration;
 import ru.mail.teamcity.ssh.config.HostBean;
 import ru.mail.teamcity.ssh.config.HostManager;
+import ru.mail.teamcity.ssh.config.PresetBean;
+import ru.mail.teamcity.ssh.config.PresetManager;
 import ru.mail.teamcity.ssh.shell.ShellManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,14 +56,17 @@ public class WebSshConfigTab extends SimpleCustomTab {
     public void fillModel(@NotNull Map<String, Object> model, @NotNull HttpServletRequest httpServletRequest) {
         SUser user = SessionUser.getUser(httpServletRequest);
         List<HostBean> hosts = Lists.newArrayList();
+        List<PresetBean> presets = Lists.newArrayList();
         try {
             hosts = HostManager.hosts(serverPaths, user);
+            presets = PresetManager.list(serverPaths, user);
         } catch (JAXBException e) {
             model.put("error", e.getCause().toString());
             e.printStackTrace();
         }
 
         model.put("hosts", hosts);
+        model.put("presets", presets);
         model.put("connections", ShellManager.getUserConnections(user));
     }
 }

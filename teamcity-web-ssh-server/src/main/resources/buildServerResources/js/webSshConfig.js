@@ -173,5 +173,29 @@ BS.WebSshConfiguration = {
             });
             return false;
         }
+    }),
+
+    DeletePresetDialog: OO.extend(BS.AbstractModalDialog, {
+        getContainer: function () {
+            return $('webSshPresetDeleteForm');
+        },
+
+        showDialog: function (hostId, hostName) {
+            $('webSshPresetDeleteId').value = hostId;
+            $('webSshPresetDeleteName').innerHTML = hostName;
+            this.showCentered();
+        },
+
+        submit: function (url) {
+            var that = this;
+            BS.ajaxRequest(base_uri + url + "?delete=true&id=" + $('webSshPresetDeleteId').value, {
+                method: 'post',
+                onComplete: function (transport) {
+                    document.location.reload();
+                    that.close();
+                }
+            });
+            return false;
+        }
     })
 };

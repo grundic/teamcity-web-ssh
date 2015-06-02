@@ -8,12 +8,18 @@
 <jsp:useBean id="hosts" scope="request"
              type="java.util.List<ru.mail.teamcity.ssh.config.HostBean>"/>
 
+<jsp:useBean id="presets" scope="request"
+             type="java.util.List<ru.mail.teamcity.ssh.config.PresetBean>"/>
+
 <jsp:useBean id="connections" scope="request"
              type="java.util.Collection<ru.mail.teamcity.ssh.shell.SshConnectionInfo>"/>
 
 
-<c:set var="controllerAjaxUrl"><c:url value="/webSshConfigController.html"/></c:set>
-<c:set var="formId"><c:url value="webSshHostForm"/></c:set>
+<c:set var="hostDialogAjaxUrl"><c:url value="/webSshHostConfigController.html"/></c:set>
+<c:set var="hostFormId"><c:url value="webSshHostForm"/></c:set>
+<c:set var="presetDialogAjaxUrl"><c:url value="/webSshPresetConfigController.html"/></c:set>
+<c:set var="presetFormId"><c:url value="webSshPresetForm"/></c:set>
+
 
 
 <div class="section noMargin">
@@ -25,50 +31,97 @@
         he/she always can read more here.
     </div>
 
-    <c:choose>
-        <c:when test="${not empty hosts}">
-            <l:tableWithHighlighting className="webSshHosts" highlightImmediately="true">
-                <tr class="header">
-                    <th colspan="4">Configured hosts</th>
-                </tr>
-                <c:forEach var="host" items="${hosts}">
-                    <tr>
-                        <td class="highlight">
-                                ${host.login}@${host.host}:${host.port}
-                        </td>
-                        <td class="highlight edit">
-                            <a href="webSshShell.html?id=${host.id}" target="_blank">
-                                connect
-                            </a>
-                        </td>
-                        <td class="highlight edit">
-                            <a href="#"
-                               onclick="return BS.WebSshConfiguration.showDialog(event, '${formId}', '${controllerAjaxUrl}', 'id=${host.id}'); return false">
-                                edit
-                            </a>
-                        </td>
-                        <td class="highlight edit">
-                            <a href="#"
-                               onclick="BS.WebSshConfiguration.DeleteHostDialog.showDialog('${host.id}', '${util:forJS(host.host, true, true)}'); return false">
-                                delete
-                            </a>
-                        </td>
+    <%-- Hosts block --%>
+    <div>
+        <c:choose>
+            <c:when test="${not empty hosts}">
+                <l:tableWithHighlighting className="webSshHosts" highlightImmediately="true">
+                    <tr class="header">
+                        <th colspan="4">Configured hosts</th>
                     </tr>
-                </c:forEach>
-            </l:tableWithHighlighting>
-        </c:when>
-        <c:otherwise>
-            <p>No hosts are configured yet.</p>
-        </c:otherwise>
-    </c:choose>
+                    <c:forEach var="host" items="${hosts}">
+                        <tr>
+                            <td class="highlight">
+                                    ${host.login}@${host.host}:${host.port}
+                            </td>
+                            <td class="highlight edit">
+                                <a href="webSshShell.html?id=${host.id}" target="_blank">
+                                    connect
+                                </a>
+                            </td>
+                            <td class="highlight edit">
+                                <a href="#"
+                                   onclick="return BS.WebSshConfiguration.showDialog(event, '${hostFormId}', '${hostDialogAjaxUrl}', 'id=${host.id}'); return false">
+                                    edit
+                                </a>
+                            </td>
+                            <td class="highlight edit">
+                                <a href="#"
+                                   onclick="BS.WebSshConfiguration.DeleteHostDialog.showDialog('${host.id}', '${util:forJS(host.host, true, true)}'); return false">
+                                    delete
+                                </a>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </l:tableWithHighlighting>
+            </c:when>
+            <c:otherwise>
+                <p>No hosts are configured yet.</p>
+            </c:otherwise>
+        </c:choose>
 
-    <p>
-        <forms:addButton
-                onclick="return BS.WebSshConfiguration.showDialog(event, '${formId}', '${controllerAjaxUrl}', ''); return false">
-            Add new host
-        </forms:addButton>
-    </p>
+        <p>
+            <forms:addButton
+                    onclick="return BS.WebSshConfiguration.showDialog(event, '${hostFormId}', '${hostDialogAjaxUrl}', ''); return false">
+                Add new host
+            </forms:addButton>
+        </p>
+    </div>
 
+    <%-- Presets block --%>
+    <div>
+        <c:choose>
+            <c:when test="${not empty presets}">
+                <l:tableWithHighlighting className="webSshHosts" highlightImmediately="true">
+                    <tr class="header">
+                        <th colspan="3">Configured host presets</th>
+                    </tr>
+                    <c:forEach var="preset" items="${presets}">
+                        <tr>
+                            <td class="highlight">
+                                    ${preset.name}
+                            </td>
+
+                            <td class="highlight edit">
+                                <a href="#"
+                                   onclick="return BS.WebSshConfiguration.showDialog(event, '${presetFormId}', '${presetDialogAjaxUrl}', 'id=${preset.id}'); return false">
+                                    edit
+                                </a>
+                            </td>
+                            <td class="highlight edit">
+                                <a href="#"
+                                   onclick="BS.WebSshConfiguration.DeletePresetDialog.showDialog('${preset.id}', '${util:forJS(preset.name, true, true)}'); return false">
+                                    delete
+                                </a>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </l:tableWithHighlighting>
+            </c:when>
+            <c:otherwise>
+                <p>No host presets are configured yet.</p>
+            </c:otherwise>
+        </c:choose>
+
+        <p>
+            <forms:addButton
+                    onclick="return BS.WebSshConfiguration.showDialog(event, '${presetFormId}', '${presetDialogAjaxUrl}', ''); return false">
+                Add new preset
+            </forms:addButton>
+        </p>
+    </div>
+
+    <%-- Connections block --%>
     <c:choose>
         <c:when test="${not empty connections}">
             <div id="connections">
@@ -90,21 +143,22 @@
         </c:otherwise>
     </c:choose>
 
+    <%-- Host modal dialogs --%>
     <bs:modalDialog
-            formId="${formId}"
+            formId="${hostFormId}"
             title="Host configuration"
-            action="${controllerAjaxUrl}"
+            action="${hostDialogAjaxUrl}"
             closeCommand="BS.WebSshConfiguration.CreateHostDialog.close()"
             saveCommand="BS.WebSshConfiguration.CreateHostDialog.submit()"
             >
-        <bs:refreshable containerId="webSshHostFormMainRefresh" pageUrl="${controllerAjaxUrl}"/>
+        <bs:refreshable containerId="webSshHostFormMainRefresh" pageUrl="${hostDialogAjaxUrl}"/>
     </bs:modalDialog>
 
     <bs:modalDialog formId="webSshHostDeleteForm"
                     title="Delete host"
-                    action="${controllerAjaxUrl}"
+                    action="${hostDialogAjaxUrl}"
                     closeCommand="BS.WebSshConfiguration.DeleteHostDialog.close()"
-                    saveCommand="BS.WebSshConfiguration.DeleteHostDialog.submit('${controllerAjaxUrl}')">
+                    saveCommand="BS.WebSshConfiguration.DeleteHostDialog.submit('${hostDialogAjaxUrl}')">
         Are you sure you want to delete "<span id="webSshHostDeleteName"></span>"?
         <input type="hidden" name="webSshHostDeleteId" id="webSshHostDeleteId"/>
 
@@ -113,8 +167,34 @@
             <forms:cancel onclick="BS.WebSshConfiguration.DeleteHostDialog.close(); return false" label="Cancel"/>
         </div>
     </bs:modalDialog>
+
+    <%-- Preset modal dialogs --%>
+    <bs:modalDialog
+            formId="${presetFormId}"
+            title="Preset configuration"
+            action="${presetDialogAjaxUrl}"
+            closeCommand="BS.WebSshConfiguration.CreateHostDialog.close()"
+            saveCommand="BS.WebSshConfiguration.CreateHostDialog.submit()"
+            >
+        <bs:refreshable containerId="webSshPresetFormMainRefresh" pageUrl="${presetDialogAjaxUrl}"/>
+    </bs:modalDialog>
+
+    <bs:modalDialog formId="webSshPresetDeleteForm"
+                    title="Delete preset"
+                    action="${presetDialogAjaxUrl}"
+                    closeCommand="BS.WebSshConfiguration.DeletePresetDialog.close()"
+                    saveCommand="BS.WebSshConfiguration.DeletePresetDialog.submit('${presetDialogAjaxUrl}')">
+        Are you sure you want to delete "<span id="webSshPresetDeleteName"></span>"?
+        <input type="hidden" name="webSshPresetDeleteId" id="webSshPresetDeleteId"/>
+
+        <div class="popupSaveButtonsBlock">
+            <forms:submit label="Delete"/>
+            <forms:cancel onclick="BS.WebSshConfiguration.DeletePresetDialog.close(); return false" label="Cancel"/>
+        </div>
+    </bs:modalDialog>
 </div>
 
+<%-- Errors block --%>
 <c:choose>
     <c:when test="${not empty error}">
         <div class="error"><c:out value="${error}"/></div>
