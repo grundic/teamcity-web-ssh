@@ -5,10 +5,25 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <jsp:useBean id="bean" type="ru.mail.teamcity.ssh.config.HostBean" scope="request"/>
-
+<jsp:useBean id="presets" type="java.util.List<ru.mail.teamcity.ssh.config.PresetBean>" scope="request"/>
 
 <div>
     <table class="sshHostFormTable">
+
+        <tr id="presetContainer">
+            <th><label for="host">Preset: <l:star/></label></th>
+            <td>
+                <forms:select name="presetId" enableFilter="true" style="width:25em">
+                    <option value="">-- Select preset --</option>
+                    <c:forEach var="preset" items="${presets}">
+                        <c:set var="selected" value="${preset.id eq bean.presetId}"/>
+                        <forms:option value="${preset.id}" selected="${selected}">
+                            <c:out value="${preset.name}"/>
+                        </forms:option>
+                    </c:forEach>
+                </forms:select>
+            </td>
+        </tr>
 
         <tr id="hostContainer">
             <th><label for="host">Host: <l:star/></label></th>

@@ -1,5 +1,6 @@
 package ru.mail.teamcity.ssh.controller;
 
+import com.google.common.collect.Lists;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.serverSide.SBuildServer;
@@ -15,12 +16,15 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
 import ru.mail.teamcity.ssh.config.HostBean;
 import ru.mail.teamcity.ssh.config.HostManager;
+import ru.mail.teamcity.ssh.config.PresetBean;
+import ru.mail.teamcity.ssh.config.PresetManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -58,6 +62,14 @@ public class WebSshHostConfigController extends BaseFormXmlController {
         Map<String, Object> params = new HashMap<String, Object>();
         SUser user = SessionUser.getUser(httpServletRequest);
 
+        List<PresetBean> presets = Lists.newArrayList();
+        try {
+            presets = PresetManager.list(serverPaths, user);
+        } catch (JAXBException e) {
+            // TODO: handle error
+            e.printStackTrace();
+        }
+
         HostBean bean = null;
         String id = httpServletRequest.getParameter("id");
         if (null != id) {
@@ -66,6 +78,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
                 String encryptedPassword = RSACipher.encryptDataForWeb(bean.getPassword());
                 bean.setEncryptedPassword(encryptedPassword);
                 bean.setPassword("");
+
             } catch (JAXBException e) {
                 // TODO: handle error
                 e.printStackTrace();
@@ -74,6 +87,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
         bean = null == bean ? new HostBean() : bean;
 
         params.put("bean", bean);
+        params.put("presets", presets);
         return new ModelAndView(pluginDescriptor.getPluginResourcesPath("webSshHostConfigDialog.jsp"), params);
     }
 
