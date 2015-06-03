@@ -177,7 +177,7 @@ BS.WebSshConfiguration = {
 
     DeletePresetDialog: OO.extend(BS.AbstractModalDialog, {
         getContainer: function () {
-            return $('webSshPresetDeleteForm');
+            return $('webSshPresetDeleteFormDialog');
         },
 
         showDialog: function (hostId, hostName) {
