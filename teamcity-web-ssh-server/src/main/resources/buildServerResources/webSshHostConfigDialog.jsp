@@ -7,6 +7,55 @@
 <jsp:useBean id="bean" type="ru.mail.teamcity.ssh.config.HostBean" scope="request"/>
 <jsp:useBean id="presets" type="java.util.List<ru.mail.teamcity.ssh.config.PresetBean>" scope="request"/>
 
+<script language="JavaScript">
+
+    var hostFields = {};
+
+    function saveHostFields() {
+        hostFields['login'] = $j("#login").val();
+    }
+
+    function setPresetFields(presetId) {
+        $j.ajax({
+            type: "GET",
+            url: window['base_uri'] + '/webSshPresetResource.html',
+            data: "id=" + presetId,
+            success: function (response) {
+                saveHostFields();
+                $j("#login").val(response.login);
+                $j("#login").prop('disabled', true);
+                $j("#password").prop('disabled', true);
+            }
+        });
+    }
+
+    function setHostFields() {
+        console.log(hostFields);
+        if (hostFields['login'] != undefined) {
+            $j("#login").val(hostFields['login']);
+        }
+        $j("#login").prop('disabled', false);
+        $j("#password").prop('disabled', false);
+    }
+
+    function setPresetOrHostFields(presetId) {
+        if (presetId != "") {
+            setPresetFields(presetId);
+        } else {
+            setHostFields();
+        }
+    }
+
+    $j(document).ready(function () {
+        setPresetOrHostFields($j('#presetId').val());
+
+        $j('#presetId').change(function () {
+            setPresetOrHostFields($j(this).val());
+        });
+    });
+
+</script>
+
 <div>
     <table class="sshHostFormTable">
 

@@ -5,6 +5,7 @@
     <bean class="ru.mail.teamcity.ssh.web.WebSshConfigTab"/>
     <bean class="ru.mail.teamcity.ssh.controller.WebSshHostConfigController"/>
     <bean class="ru.mail.teamcity.ssh.controller.WebSshPresetConfigController"/>
+    <bean class="ru.mail.teamcity.ssh.controller.WebSshPresetResourceController"/>
     <bean class="ru.mail.teamcity.ssh.controller.WebSshShellController"/>
     <bean class="ru.mail.teamcity.ssh.controller.SshUpdateHandler"/>
     <bean class="ru.mail.teamcity.ssh.web.WebSshShellPage"/>
