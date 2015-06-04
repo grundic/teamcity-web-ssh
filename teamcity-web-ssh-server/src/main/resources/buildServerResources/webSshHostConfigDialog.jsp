@@ -15,6 +15,25 @@
         hostFields['login'] = $j("#login").val();
     }
 
+    function createElementClone(elementId, newValue) {
+        var cloneElementId = elementId + 'Cloned';
+        var realElement = $j('#' + elementId);
+        var clonedElement = $j('#' + cloneElementId);
+        if (clonedElement.length == 0) {
+            clonedElement = realElement.clone(true);
+        }
+        realElement.hide();
+        clonedElement.insertAfter(realElement);
+        if (newValue != undefined) {
+            clonedElement.val(newValue);
+        }
+        clonedElement.attr('name', elementId + 'Cloned');
+        clonedElement.attr('id', elementId + 'Cloned');
+        clonedElement.prop('disabled', true);
+        clonedElement.show();
+        return clonedElement;
+    }
+
     function setPresetFields(presetId) {
         $j.ajax({
             type: "GET",
@@ -22,20 +41,24 @@
             data: "id=" + presetId,
             success: function (response) {
                 saveHostFields();
-                $j("#login").val(response.login);
-                $j("#login").prop('disabled', true);
-                $j("#password").prop('disabled', true);
+                createElementClone('login', response.login);
+                createElementClone('password');
             }
         });
     }
 
     function setHostFields() {
-        console.log(hostFields);
         if (hostFields['login'] != undefined) {
             $j("#login").val(hostFields['login']);
         }
+        var loginCloned = createElementClone('login');
+        var passwordCloned = createElementClone('password');
+        loginCloned.hide();
+        passwordCloned.hide();
         $j("#login").prop('disabled', false);
         $j("#password").prop('disabled', false);
+        $j("#login").show();
+        $j("#password").show();
     }
 
     function setPresetOrHostFields(presetId) {
