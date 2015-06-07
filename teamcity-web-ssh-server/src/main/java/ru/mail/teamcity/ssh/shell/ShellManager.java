@@ -21,8 +21,8 @@ public class ShellManager {
     public static void createSshConnection(@NotNull SUser user, @NotNull HostBean host, @NotNull AtmosphereResource resource) throws IOException, JSchException {
         JSch jsch = new JSch();
 
-        Session sshSession = jsch.getSession(host.getLogin(), host.getHost(), host.getPort());
-        sshSession.setPassword(host.getPassword());
+        Session sshSession = jsch.getSession(host.getPresetLogin(), host.getHost(), host.getPort());
+        sshSession.setPassword(host.getPresetPassword());
         sshSession.setConfig("StrictHostKeyChecking", "no");
 
         sshSession.connect(30000);

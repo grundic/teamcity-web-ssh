@@ -45,6 +45,16 @@ public class HostBean extends AbstractBean {
         this.preset = preset;
     }
 
+    @XmlTransient
+    public String getPresetLogin() {
+        return preset == null ? super.getLogin() : preset.getLogin();
+    }
+
+    @XmlTransient
+    public String getPresetPassword() {
+        return preset == null ? super.getPassword() : preset.getPassword();
+    }
+
     public String getHost() {
         return host;
     }

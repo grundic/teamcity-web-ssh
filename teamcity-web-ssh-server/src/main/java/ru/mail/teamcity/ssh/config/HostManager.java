@@ -42,7 +42,12 @@ public class HostManager {
      */
     @Nullable
     public static HostBean load(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String name) throws JAXBException {
-        return BasicBeanManager.getInstance().load(serverPaths, user, name, CONFIG_FOLDER_NAME, HostBean.class);
+        HostBean bean = BasicBeanManager.getInstance().load(serverPaths, user, name, CONFIG_FOLDER_NAME, HostBean.class);
+        if (null != bean && null != bean.getPresetId()) {
+            PresetBean preset = PresetManager.load(serverPaths, user, bean.getPresetId().toString());
+            bean.setPreset(preset);
+        }
+        return bean;
     }
 
     @Nullable
