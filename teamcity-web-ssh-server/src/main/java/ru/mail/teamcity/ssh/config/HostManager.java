@@ -1,5 +1,10 @@
 package ru.mail.teamcity.ssh.config;
 
+import com.google.common.base.Throwables;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.intellij.openapi.util.Trinity;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +16,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Author: g.chernyshev
@@ -18,6 +25,23 @@ import java.util.List;
  */
 public class HostManager {
     private static String CONFIG_FOLDER_NAME = "hosts";
+
+    private final static LoadingCache<Trinity<ServerPaths, SUser, String>, HostBean> cache = CacheBuilder.
+            newBuilder().
+            expireAfterAccess(12, TimeUnit.HOURS).
+            build(
+                    new CacheLoader<Trinity<ServerPaths, SUser, String>, HostBean>() {
+                        @Override
+                        public HostBean load(@NotNull Trinity<ServerPaths, SUser, String> key) throws JAXBException {
+                            HostBean bean = HostManager.lazyLoad(key.getFirst(), key.getSecond(), key.getThird());
+                            if (null != bean && null != bean.getPresetId()) {
+                                PresetBean preset = PresetManager.load(key.getFirst(), key.getSecond(), bean.getPresetId().toString());
+                                bean.setPreset(preset);
+                            }
+                            return bean;
+                        }
+                    }
+            );
 
 
     @NotNull
@@ -42,12 +66,12 @@ public class HostManager {
      */
     @Nullable
     public static HostBean load(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String name) throws JAXBException {
-        HostBean bean = lazyLoad(serverPaths, user, name);
-        if (null != bean && null != bean.getPresetId()) {
-            PresetBean preset = PresetManager.load(serverPaths, user, bean.getPresetId().toString());
-            bean.setPreset(preset);
+        try {
+            return cache.get(new Trinity<>(serverPaths, user, name));
+        } catch (ExecutionException e) {
+            Throwables.propagateIfPossible(e.getCause(), JAXBException.class);
+            throw new IllegalStateException(e);
         }
-        return bean;
     }
 
     protected static HostBean lazyLoad(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String name) throws JAXBException {
@@ -97,10 +121,12 @@ public class HostManager {
      */
     public static void save(@NotNull ServerPaths serverPaths, @NotNull SUser user, HostBean bean) throws IOException, JAXBException {
         BasicBeanManager.getInstance().save(serverPaths, user, CONFIG_FOLDER_NAME, bean);
+        cache.put(new Trinity<>(serverPaths, user, bean.getId().toString()), bean);
     }
 
     public static void delete(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String name) {
         BasicBeanManager.getInstance().delete(serverPaths, user, CONFIG_FOLDER_NAME, name);
+        cache.invalidate(new Trinity<>(serverPaths, user, name));
     }
 }
 
