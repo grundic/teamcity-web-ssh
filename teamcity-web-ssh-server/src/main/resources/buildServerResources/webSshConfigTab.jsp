@@ -42,7 +42,9 @@
                     <c:forEach var="host" items="${hosts}">
                         <tr>
                             <td class="highlight">
-                                    ${host.presetLogin}@${host.host}:${host.port}
+                                    <span <c:if test="${not empty host.preset}">style="font-style: italic"</c:if>>
+                                    ${host.delegate.login}@${host.host}:${host.port}
+                                    </span>
                             </td>
                             <td class="highlight edit">
                                 <a href="webSshShell.html?id=${host.id}" target="_blank">
