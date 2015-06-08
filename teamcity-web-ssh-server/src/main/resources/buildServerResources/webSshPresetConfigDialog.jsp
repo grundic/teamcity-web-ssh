@@ -19,7 +19,27 @@
         </tr>
 
         <%@ include file="webSshCredentialsConfig.jsp" %>
+
+        <c:choose>
+            <c:when test="${bean.hosts.size() > 0}">
+                <tr>
+                    <td colspan="2" style="background-color: #F5F5F5;">
+                        <span>List of hosts, linked with this preset:</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <ul>
+                            <c:forEach var="host" items="${bean.hosts}">
+                                <li>${host.host}</li>
+                            </c:forEach>
+                        </ul>
+                    </td>
+                </tr>
+            </c:when>
+        </c:choose>
     </table>
+
 
     <span class="error" id="errorVarious"></span>
 

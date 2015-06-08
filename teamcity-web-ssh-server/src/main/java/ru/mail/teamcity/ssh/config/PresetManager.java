@@ -1,5 +1,6 @@
 package ru.mail.teamcity.ssh.config;
 
+import com.google.common.collect.Lists;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
@@ -20,12 +21,23 @@ public class PresetManager {
 
     @Nullable
     public static PresetBean load(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String name) throws JAXBException {
-        return BasicBeanManager.getInstance().load(serverPaths, user, name, CONFIG_FOLDER_NAME, PresetBean.class);
+        PresetBean bean = BasicBeanManager.getInstance().load(serverPaths, user, name, CONFIG_FOLDER_NAME, PresetBean.class);
+        if (null != bean) {
+            List<HostBean> hosts = Lists.newArrayList();
+            for (HostBean host : HostManager.lazyList(serverPaths, user)) {
+                if (null != host.getPresetId() && host.getPresetId().equals(bean.getId())) {
+                    host.setPreset(bean);
+                    hosts.add(host);
+                }
+            }
+            bean.setHosts(hosts);
+        }
+        return bean;
     }
 
     @NotNull
     public static List<PresetBean> list(@NotNull ServerPaths serverPaths, @NotNull SUser user) throws JAXBException {
-        List<PresetBean> beans = new ArrayList<PresetBean>();
+        List<PresetBean> beans = new ArrayList<>();
 
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(serverPaths, user, CONFIG_FOLDER_NAME)) {
             PresetBean bean = load(serverPaths, user, filename);

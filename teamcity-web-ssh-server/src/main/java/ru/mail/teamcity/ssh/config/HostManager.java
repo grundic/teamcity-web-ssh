@@ -17,12 +17,12 @@ import java.util.List;
  * Date: 02.06.15
  */
 public class HostManager {
-    protected static String CONFIG_FOLDER_NAME = "hosts";
+    private static String CONFIG_FOLDER_NAME = "hosts";
 
 
     @NotNull
-    public static List<HostBean> hosts(@NotNull ServerPaths serverPaths, @NotNull SUser user) throws JAXBException {
-        List<HostBean> hosts = new ArrayList<HostBean>();
+    public static List<HostBean> list(@NotNull ServerPaths serverPaths, @NotNull SUser user) throws JAXBException {
+        List<HostBean> hosts = new ArrayList<>();
 
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(serverPaths, user, CONFIG_FOLDER_NAME)) {
             HostBean host = load(serverPaths, user, filename);
@@ -42,12 +42,26 @@ public class HostManager {
      */
     @Nullable
     public static HostBean load(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String name) throws JAXBException {
-        HostBean bean = BasicBeanManager.getInstance().load(serverPaths, user, name, CONFIG_FOLDER_NAME, HostBean.class);
+        HostBean bean = lazyLoad(serverPaths, user, name);
         if (null != bean && null != bean.getPresetId()) {
             PresetBean preset = PresetManager.load(serverPaths, user, bean.getPresetId().toString());
             bean.setPreset(preset);
         }
         return bean;
+    }
+
+    protected static HostBean lazyLoad(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String name) throws JAXBException {
+        return BasicBeanManager.getInstance().load(serverPaths, user, name, CONFIG_FOLDER_NAME, HostBean.class);
+    }
+
+    protected static List<HostBean> lazyList(@NotNull ServerPaths serverPaths, @NotNull SUser user) throws JAXBException {
+        List<HostBean> hosts = new ArrayList<>();
+
+        for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(serverPaths, user, CONFIG_FOLDER_NAME)) {
+            HostBean host = lazyLoad(serverPaths, user, filename);
+            hosts.add(host);
+        }
+        return hosts;
     }
 
     @Nullable
@@ -59,7 +73,7 @@ public class HostManager {
         } catch (UnknownHostException e) {
             return null;
         }
-        for (HostBean host : hosts(serverPaths, user)) {
+        for (HostBean host : list(serverPaths, user)) {
             try {
                 InetAddress hostIp = InetAddress.getByName(host.getHost());
                 if (hostIp.getHostAddress().equalsIgnoreCase(requiredIp.getHostAddress())) {

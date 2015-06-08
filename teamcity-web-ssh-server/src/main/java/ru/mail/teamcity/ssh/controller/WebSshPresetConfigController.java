@@ -82,12 +82,25 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
     }
 
     private void delete(@NotNull HttpServletRequest httpServletRequest) {
+        ActionErrors errors = new ActionErrors();
         String id = httpServletRequest.getParameter("id");
         if (null == id) {
             return;
         }
         SUser user = SessionUser.getUser(httpServletRequest);
 
+        PresetBean bean;
+        try {
+            bean = PresetManager.load(serverPaths, user, id);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+            errors.addError("jaxbException", e.toString());
+            return;
+        }
+
+        if (null != bean && bean.getHosts().size() > 0) {
+            errors.addError("presetHostsNotEmpty", "Can't remove preset, because it is used in some hosts!");
+        }
         PresetManager.delete(serverPaths, user, id);
     }
 

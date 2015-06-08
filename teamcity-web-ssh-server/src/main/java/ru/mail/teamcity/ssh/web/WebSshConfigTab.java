@@ -58,7 +58,7 @@ public class WebSshConfigTab extends SimpleCustomTab {
         List<HostBean> hosts = Lists.newArrayList();
         List<PresetBean> presets = Lists.newArrayList();
         try {
-            hosts = HostManager.hosts(serverPaths, user);
+            hosts = HostManager.list(serverPaths, user);
             presets = PresetManager.list(serverPaths, user);
         } catch (JAXBException e) {
             model.put("error", e.getCause().toString());

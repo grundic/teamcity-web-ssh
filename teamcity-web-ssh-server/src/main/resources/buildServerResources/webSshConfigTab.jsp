@@ -21,7 +21,6 @@
 <c:set var="presetFormId"><c:url value="webSshPresetForm"/></c:set>
 
 
-
 <div class="section noMargin">
     <h2 class="noBorder">Ssh hosts configuration</h2>
 
@@ -101,10 +100,18 @@
                                 </a>
                             </td>
                             <td class="highlight edit">
-                                <a href="#"
-                                   onclick="BS.WebSshConfiguration.DeletePresetDialog.showDialog('${preset.id}', '${util:forJS(preset.name, true, true)}'); return false">
-                                    delete
-                                </a>
+                                <c:choose>
+                                    <c:when test="${preset.hosts.size() == 0}">
+                                        <a href="#"
+                                           onclick="BS.WebSshConfiguration.DeletePresetDialog.showDialog('${preset.id}', '${util:forJS(preset.name, true, true)}'); return false">
+                                            delete
+                                        </a>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span style="color:#7F7F7F"
+                                              title="There are ${preset.hosts.size()} usage(s) of this preset">delete</span>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                         </tr>
                     </c:forEach>
