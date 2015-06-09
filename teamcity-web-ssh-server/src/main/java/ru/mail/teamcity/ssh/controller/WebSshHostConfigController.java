@@ -24,7 +24,6 @@ import javax.xml.bind.JAXBException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * User: g.chernyshev
@@ -35,10 +34,6 @@ public class WebSshHostConfigController extends BaseFormXmlController {
 
     @NotNull
     private final PluginDescriptor pluginDescriptor;
-
-    private static final Pattern validIpAddressRegex = Pattern.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
-    // TODO fix host regex: it should not complain on underscore symbol
-    private static final Pattern validHostnameRegex = Pattern.compile("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$");
 
     public WebSshHostConfigController(
             @NotNull SBuildServer buildServer,
@@ -52,7 +47,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
 
     @Override
     protected ModelAndView doGet(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         SUser user = SessionUser.getUser(httpServletRequest);
 
         List<PresetBean> presets = Lists.newArrayList();
@@ -131,8 +126,6 @@ public class WebSshHostConfigController extends BaseFormXmlController {
         // Hostname validation
         if (StringUtil.isEmptyOrSpaces(bean.getHost())) {
             errors.addError("emptyHost", "Hostname could not be empty.");
-        } else if (!validHostnameRegex.matcher(bean.getHost()).matches() && !validIpAddressRegex.matcher(bean.getHost()).matches()) {
-            errors.addError("badHostValue", "Hostname should be valid host or ip address.");
         }
 
         // Port validation
