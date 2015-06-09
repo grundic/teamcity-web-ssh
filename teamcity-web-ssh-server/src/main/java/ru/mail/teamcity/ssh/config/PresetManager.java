@@ -83,14 +83,12 @@ public class PresetManager {
         List<PresetBean> beans = new ArrayList<>();
 
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
-            PresetBean bean = null;
             try {
-                bean = load(user, filename);
+                beans.add(load(user, filename));
             } catch (JAXBException e) {
                 e.printStackTrace();
                 errors.addError(filename, ExceptionUtil.getDisplayMessage(e));
             }
-            beans.add(bean);
         }
         return beans;
     }

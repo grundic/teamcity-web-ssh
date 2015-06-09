@@ -60,14 +60,12 @@ public class HostManager {
         List<HostBean> hosts = new ArrayList<>();
 
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
-            HostBean host = null;
             try {
-                host = load(user, filename);
+                hosts.add(load(user, filename));
             } catch (JAXBException e) {
                 e.printStackTrace();
                 errors.addError(filename, ExceptionUtil.getDisplayMessage(e));
             }
-            hosts.add(host);
         }
         return hosts;
     }
