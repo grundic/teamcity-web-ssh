@@ -1,7 +1,6 @@
 package ru.mail.teamcity.ssh.web;
 
 import com.google.common.collect.Lists;
-import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PlaceId;
@@ -28,13 +27,9 @@ import java.util.Map;
  */
 public class WebSshConfigTab extends SimpleCustomTab {
 
-    @NotNull
-    private final ServerPaths serverPaths;
-
     public WebSshConfigTab(
             @NotNull final PluginDescriptor pluginDescriptor,
-            @NotNull PagePlaces pagePlaces,
-            @NotNull ServerPaths serverPaths
+            @NotNull PagePlaces pagePlaces
     ) {
         super(
                 pagePlaces,
@@ -42,7 +37,6 @@ public class WebSshConfigTab extends SimpleCustomTab {
                 AppConfiguration.PLUGIN_NAME,
                 pluginDescriptor.getPluginResourcesPath("webSshConfigTab.jsp"),
                 "Web Ssh");
-        this.serverPaths = serverPaths;
 
         addCssFile(pluginDescriptor.getPluginResourcesPath("css/webSshConfig.css"));
         addJsFile(pluginDescriptor.getPluginResourcesPath("js/webSshConfig.js"));
@@ -58,8 +52,8 @@ public class WebSshConfigTab extends SimpleCustomTab {
         List<HostBean> hosts = Lists.newArrayList();
         List<PresetBean> presets = Lists.newArrayList();
         try {
-            hosts = HostManager.list(serverPaths, user);
-            presets = PresetManager.list(serverPaths, user);
+            hosts = HostManager.list(user);
+            presets = PresetManager.list(user);
         } catch (JAXBException e) {
             model.put("error", e.getCause().toString());
             e.printStackTrace();

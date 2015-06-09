@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.util.StringUtil;
@@ -38,9 +37,6 @@ public class WebSshHostConfigController extends BaseFormXmlController {
     @NotNull
     private final PluginDescriptor pluginDescriptor;
 
-    @NotNull
-    private final ServerPaths serverPaths;
-
     private static final Pattern validIpAddressRegex = Pattern.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
     // TODO fix host regex: it should not complain on underscore symbol
     private static final Pattern validHostnameRegex = Pattern.compile("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$");
@@ -48,12 +44,10 @@ public class WebSshHostConfigController extends BaseFormXmlController {
     public WebSshHostConfigController(
             @NotNull SBuildServer buildServer,
             @NotNull WebControllerManager webControllerManager,
-            @NotNull PluginDescriptor pluginDescriptor,
-            @NotNull ServerPaths serverPaths
+            @NotNull PluginDescriptor pluginDescriptor
     ) {
         super(buildServer);
         this.pluginDescriptor = pluginDescriptor;
-        this.serverPaths = serverPaths;
         webControllerManager.registerController("/webSshHostConfigController.html", this);
     }
 
@@ -64,7 +58,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
 
         List<PresetBean> presets = Lists.newArrayList();
         try {
-            presets = PresetManager.list(serverPaths, user);
+            presets = PresetManager.list(user);
         } catch (JAXBException e) {
             // TODO: handle error
             e.printStackTrace();
@@ -74,7 +68,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
         String id = httpServletRequest.getParameter("id");
         if (null != id) {
             try {
-                bean = HostManager.load(serverPaths, user, id);
+                bean = HostManager.load(user, id);
                 String encryptedPassword = RSACipher.encryptDataForWeb(bean.getPassword());
                 bean.setEncryptedPassword(encryptedPassword);
                 bean.setPassword("");
@@ -108,7 +102,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
         }
         SUser user = SessionUser.getUser(httpServletRequest);
 
-        HostManager.delete(serverPaths, user, id);
+        HostManager.delete(user, id);
     }
 
     private void save(@NotNull HttpServletRequest httpServletRequest, @NotNull Element element) {
@@ -125,7 +119,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
 
         SUser user = SessionUser.getUser(httpServletRequest);
         try {
-            HostManager.save(serverPaths, user, bean);
+            HostManager.save(user, bean);
         } catch (IOException e) {
             errors.addError("ioException", e.getMessage());
             writeErrors(element, errors);

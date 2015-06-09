@@ -2,7 +2,6 @@ package ru.mail.teamcity.ssh.controller;
 
 import com.google.gson.Gson;
 import com.intellij.openapi.util.text.StringUtil;
-import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildServer.web.util.SessionUser;
@@ -21,14 +20,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class WebSshPresetResourceController extends AbstractController {
 
-    @NotNull
-    private final ServerPaths serverPaths;
 
     public WebSshPresetResourceController(
-            @NotNull WebControllerManager webControllerManager,
-            @NotNull ServerPaths serverPaths
+            @NotNull WebControllerManager webControllerManager
     ) {
-        this.serverPaths = serverPaths;
         webControllerManager.registerController("/webSshPresetResource.html", this);
     }
 
@@ -40,7 +35,7 @@ public class WebSshPresetResourceController extends AbstractController {
         }
 
         SUser user = SessionUser.getUser(request);
-        PresetBean bean = PresetManager.load(serverPaths, user, id);
+        PresetBean bean = PresetManager.load(user, id);
         if (null != bean) {
             bean.setPassword(""); // because view is read-only - remove password at all
             response.setContentType("application/json");

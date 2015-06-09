@@ -5,8 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
-import com.intellij.openapi.util.Trinity;
-import jetbrains.buildServer.serverSide.ServerPaths;
+import com.intellij.openapi.util.Pair;
 import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,20 +26,20 @@ public class PresetManager {
     @NotNull
     protected static String CONFIG_FOLDER_NAME = "presets";
 
-    private final static LoadingCache<Trinity<ServerPaths, SUser, String>, PresetBean> cache = CacheBuilder.
+    private final static LoadingCache<Pair<SUser, String>, PresetBean> cache = CacheBuilder.
             newBuilder().
             expireAfterAccess(12, TimeUnit.HOURS).
             build(
-                    new CacheLoader<Trinity<ServerPaths, SUser, String>, PresetBean>() {
+                    new CacheLoader<Pair<SUser, String>, PresetBean>() {
                         @Override
-                        public PresetBean load(@NotNull Trinity<ServerPaths, SUser, String> key) throws JAXBException {
+                        public PresetBean load(@NotNull Pair<SUser, String> key) throws JAXBException {
                             PresetBean bean = BasicBeanManager.getInstance().load(
-                                    key.getFirst(), key.getSecond(), key.getThird(), CONFIG_FOLDER_NAME, PresetBean.class
+                                    key.getFirst(), key.getSecond(), CONFIG_FOLDER_NAME, PresetBean.class
                             );
 
                             if (null != bean) {
                                 List<HostBean> hosts = Lists.newArrayList();
-                                for (HostBean host : HostManager.lazyList(key.getFirst(), key.getSecond())) {
+                                for (HostBean host : HostManager.lazyList(key.getFirst())) {
                                     if (null != host.getPresetId() && host.getPresetId().equals(bean.getId())) {
                                         host.setPreset(bean);
                                         hosts.add(host);
@@ -54,9 +53,9 @@ public class PresetManager {
             );
 
     @Nullable
-    public static PresetBean load(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String name) throws JAXBException {
+    public static PresetBean load(@NotNull SUser user, @NotNull String name) throws JAXBException {
         try {
-            return cache.get(new Trinity<>(serverPaths, user, name));
+            return cache.get(new Pair<>(user, name));
         } catch (ExecutionException e) {
             Throwables.propagateIfPossible(
                     e.getCause(), JAXBException.class);
@@ -65,24 +64,24 @@ public class PresetManager {
     }
 
     @NotNull
-    public static List<PresetBean> list(@NotNull ServerPaths serverPaths, @NotNull SUser user) throws JAXBException {
+    public static List<PresetBean> list(@NotNull SUser user) throws JAXBException {
         List<PresetBean> beans = new ArrayList<>();
 
-        for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(serverPaths, user, CONFIG_FOLDER_NAME)) {
-            PresetBean bean = load(serverPaths, user, filename);
+        for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
+            PresetBean bean = load(user, filename);
             beans.add(bean);
         }
         return beans;
     }
 
-    public static void save(@NotNull ServerPaths serverPaths, @NotNull SUser user, PresetBean bean) throws IOException, JAXBException {
-        BasicBeanManager.getInstance().save(serverPaths, user, CONFIG_FOLDER_NAME, bean);
-        cache.put(new Trinity<>(serverPaths, user, bean.getId().toString()), bean);
+    public static void save(@NotNull SUser user, PresetBean bean) throws IOException, JAXBException {
+        BasicBeanManager.getInstance().save(user, CONFIG_FOLDER_NAME, bean);
+        cache.put(new Pair<>(user, bean.getId().toString()), bean);
     }
 
-    public static void delete(@NotNull ServerPaths serverPaths, @NotNull SUser user, @NotNull String name) {
-        BasicBeanManager.getInstance().delete(serverPaths, user, CONFIG_FOLDER_NAME, name);
-        cache.invalidate(new Trinity<>(serverPaths, user, name));
+    public static void delete(@NotNull SUser user, @NotNull String name) {
+        BasicBeanManager.getInstance().delete(user, CONFIG_FOLDER_NAME, name);
+        cache.invalidate(new Pair<>(user, name));
     }
 
 }

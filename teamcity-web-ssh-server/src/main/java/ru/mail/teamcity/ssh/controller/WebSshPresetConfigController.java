@@ -3,7 +3,6 @@ package ru.mail.teamcity.ssh.controller;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
@@ -31,18 +30,13 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
     @NotNull
     private final PluginDescriptor pluginDescriptor;
 
-    @NotNull
-    private final ServerPaths serverPaths;
-
     public WebSshPresetConfigController(
             @NotNull SBuildServer buildServer,
             @NotNull WebControllerManager webControllerManager,
-            @NotNull PluginDescriptor pluginDescriptor,
-            @NotNull ServerPaths serverPaths
+            @NotNull PluginDescriptor pluginDescriptor
     ) {
         super(buildServer);
         this.pluginDescriptor = pluginDescriptor;
-        this.serverPaths = serverPaths;
         webControllerManager.registerController("/webSshPresetConfigController.html", this);
 
     }
@@ -56,7 +50,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
         String id = httpServletRequest.getParameter("id");
         if (null != id) {
             try {
-                bean = PresetManager.load(serverPaths, user, id);
+                bean = PresetManager.load(user, id);
                 String encryptedPassword = RSACipher.encryptDataForWeb(bean.getPassword());
                 bean.setEncryptedPassword(encryptedPassword);
                 bean.setPassword("");
@@ -91,7 +85,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
 
         PresetBean bean;
         try {
-            bean = PresetManager.load(serverPaths, user, id);
+            bean = PresetManager.load(user, id);
         } catch (JAXBException e) {
             e.printStackTrace();
             errors.addError("jaxbException", e.toString());
@@ -101,7 +95,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
         if (null != bean && bean.getHosts().size() > 0) {
             errors.addError("presetHostsNotEmpty", "Can't remove preset, because it is used in some hosts!");
         }
-        PresetManager.delete(serverPaths, user, id);
+        PresetManager.delete(user, id);
     }
 
     private void save(@NotNull HttpServletRequest httpServletRequest, @NotNull Element element) {
@@ -118,7 +112,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
 
         SUser user = SessionUser.getUser(httpServletRequest);
         try {
-            PresetManager.save(serverPaths, user, bean);
+            PresetManager.save(user, bean);
         } catch (IOException e) {
             errors.addError("ioException", e.getMessage());
             writeErrors(element, errors);

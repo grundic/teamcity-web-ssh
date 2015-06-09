@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jcraft.jsch.JSchException;
-import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.util.SessionUser;
 import org.apache.commons.lang.StringUtils;
@@ -34,13 +33,6 @@ import java.util.Map;
  */
 public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
 
-    @NotNull
-    private final ServerPaths serverPaths;
-
-    public SshUpdateHandler(@NotNull ServerPaths serverPaths) {
-        this.serverPaths = serverPaths;
-    }
-
     public void onRequest(AtmosphereResource resource) throws IOException {
         if (resource.getRequest().getMethod().equalsIgnoreCase("GET")) {
             onOpen(resource);
@@ -58,9 +50,9 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
 
         try {
             if (null != id && StringUtils.isNotEmpty(id)) {
-                host = HostManager.load(serverPaths, user, id);
+                host = HostManager.load(user, id);
             } else if (null != ip && StringUtils.isNotEmpty(ip)) {
-                host = HostManager.findHostByIp(serverPaths, user, ip);
+                host = HostManager.findHostByIp(user, ip);
             }
         } catch (JAXBException e) {
             sendError(resource, "Xml error", "Looks, like you xml is invalid:" + e.getMessage());
