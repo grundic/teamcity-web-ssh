@@ -32,10 +32,10 @@ public class BasicBeanManager {
     private final String CFG_EXT = "xml";
 
     @NotNull
-    private final ConcurrentMap<String, Object> fileLock = new ConcurrentHashMap<String, Object>();
+    private final ConcurrentMap<String, Object> fileLock = new ConcurrentHashMap<>();
 
     @NotNull
-    private static ServerPaths serverPaths;
+    private static ServerPaths serverPaths = new ApplicationContextProvider().getApplicationContext().getBean("serverPaths", ServerPaths.class);
 
 
     private BasicBeanManager() {
@@ -46,7 +46,6 @@ public class BasicBeanManager {
             synchronized (BasicBeanManager.class) {
                 if (instance == null) {
                     instance = new BasicBeanManager();
-                    serverPaths = new ApplicationContextProvider().getApplicationContext().getBean("serverPaths", ServerPaths.class);
                 }
             }
         }
