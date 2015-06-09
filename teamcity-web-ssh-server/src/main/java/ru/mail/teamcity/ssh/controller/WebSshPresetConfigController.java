@@ -17,7 +17,6 @@ import ru.mail.teamcity.ssh.config.PresetManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -113,9 +112,6 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
         SUser user = SessionUser.getUser(httpServletRequest);
         try {
             PresetManager.save(user, bean);
-        } catch (IOException e) {
-            errors.addError("ioException", e.getMessage());
-            writeErrors(element, errors);
         } catch (JAXBException e) {
             e.printStackTrace();
             errors.addError("jaxbException", e.getMessage());

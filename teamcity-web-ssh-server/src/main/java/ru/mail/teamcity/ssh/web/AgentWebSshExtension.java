@@ -21,7 +21,7 @@ import java.util.Map;
 public class AgentWebSshExtension extends SimplePageExtension {
 
     @NotNull
-    protected final BuildAgentManager agentManager;
+    private final BuildAgentManager agentManager;
 
     public AgentWebSshExtension(@NotNull PagePlaces pagePlaces, @NotNull PluginDescriptor pluginDescriptor, @NotNull BuildAgentManager agentManager) {
         super(

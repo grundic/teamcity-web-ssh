@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.xml.bind.JAXBException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -24,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class PresetManager {
     @NotNull
-    private static String CONFIG_FOLDER_NAME = "presets";
+    private static final String CONFIG_FOLDER_NAME = "presets";
 
     private final static LoadingCache<Pair<SUser, String>, PresetBean> cache = CacheBuilder.
             newBuilder().
@@ -77,7 +76,7 @@ public class PresetManager {
         return beans;
     }
 
-    public static void save(@NotNull SUser user, PresetBean bean) throws IOException, JAXBException {
+    public static void save(@NotNull SUser user, PresetBean bean) throws JAXBException {
         BasicBeanManager.getInstance().save(user, CONFIG_FOLDER_NAME, bean);
         cache.invalidate(new Pair<>(user, bean.getId().toString()));
     }

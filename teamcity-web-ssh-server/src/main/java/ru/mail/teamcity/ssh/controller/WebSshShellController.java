@@ -27,7 +27,7 @@ import java.util.List;
  * Time: 01:26
  */
 public class WebSshShellController extends BaseController {
-    private AtmosphereFramework atmosphereFramework;
+    private final AtmosphereFramework atmosphereFramework;
 
     public WebSshShellController(
             @NotNull SBuildServer server,

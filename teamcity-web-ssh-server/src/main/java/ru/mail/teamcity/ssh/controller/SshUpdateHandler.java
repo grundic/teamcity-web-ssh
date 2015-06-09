@@ -134,14 +134,14 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
     }
 
 
-    private void onResume(AtmosphereResponse response) throws IOException {
+    private void onResume(AtmosphereResponse response) {
     }
 
-    private void onTimeout(AtmosphereResponse response) throws IOException {
+    private void onTimeout(AtmosphereResponse response) {
         close(response.resource());
     }
 
-    private void onDisconnect(AtmosphereResponse response) throws IOException {
+    private void onDisconnect(AtmosphereResponse response) {
         close(response.resource());
     }
 

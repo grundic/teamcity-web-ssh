@@ -13,8 +13,8 @@ import java.io.InputStream;
  */
 public class ShellOutputProcessor extends Thread {
 
-    private InputStream outFromChannel;
-    private AtmosphereResource resource;
+    private final InputStream outFromChannel;
+    private final AtmosphereResource resource;
     private volatile boolean running = true;
 
 

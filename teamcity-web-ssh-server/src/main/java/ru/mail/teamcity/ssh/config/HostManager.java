@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.xml.bind.JAXBException;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * Date: 02.06.15
  */
 public class HostManager {
-    private static String CONFIG_FOLDER_NAME = "hosts";
+    private static final String CONFIG_FOLDER_NAME = "hosts";
 
     private final static LoadingCache<Pair<SUser, String>, HostBean> cache = CacheBuilder.
             newBuilder().
@@ -113,10 +112,9 @@ public class HostManager {
      *
      * @param user - Teamcity user, for whom configuration is saved
      * @param bean - data bean, that is to be saved
-     * @throws IOException
      * @throws JAXBException
      */
-    public static void save(@NotNull SUser user, HostBean bean) throws IOException, JAXBException {
+    public static void save(@NotNull SUser user, HostBean bean) throws JAXBException {
         PresetBean originalPreset = null;
         HostBean originalHost;
 
