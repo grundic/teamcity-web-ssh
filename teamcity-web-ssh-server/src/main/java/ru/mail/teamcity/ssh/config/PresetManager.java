@@ -6,7 +6,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.util.Pair;
+import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.users.SUser;
+import jetbrains.buildServer.util.ExceptionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,6 +77,24 @@ public class PresetManager {
         }
         return beans;
     }
+
+    @NotNull
+    public static List<PresetBean> list(@NotNull SUser user, @NotNull ActionErrors errors) {
+        List<PresetBean> beans = new ArrayList<>();
+
+        for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
+            PresetBean bean = null;
+            try {
+                bean = load(user, filename);
+            } catch (JAXBException e) {
+                e.printStackTrace();
+                errors.addError(filename, ExceptionUtil.getDisplayMessage(e));
+            }
+            beans.add(bean);
+        }
+        return beans;
+    }
+
 
     public static void save(@NotNull SUser user, PresetBean bean) throws JAXBException {
         BasicBeanManager.getInstance().save(user, CONFIG_FOLDER_NAME, bean);

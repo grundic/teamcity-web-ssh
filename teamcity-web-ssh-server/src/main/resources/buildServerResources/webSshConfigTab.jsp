@@ -14,6 +14,9 @@
 <jsp:useBean id="connections" scope="request"
              type="java.util.Collection<ru.mail.teamcity.ssh.shell.SshConnectionInfo>"/>
 
+<jsp:useBean id="errors" scope="request"
+             type="jetbrains.buildServer.controllers.ActionErrors"/>
+
 
 <c:set var="hostDialogAjaxUrl"><c:url value="/webSshHostConfigController.html"/></c:set>
 <c:set var="hostFormId"><c:url value="webSshHostForm"/></c:set>
@@ -205,7 +208,11 @@
 
 <%-- Errors block --%>
 <c:choose>
-    <c:when test="${not empty error}">
-        <div class="error"><c:out value="${error}"/></div>
+    <c:when test="${not empty errors}">
+        <div class="error">
+            <c:forEach var="error" items="${errors.errors}">
+                <p><c:out value="${error.id}: ${error.message}"/></p>
+            </c:forEach>
+        </div>
     </c:when>
 </c:choose>

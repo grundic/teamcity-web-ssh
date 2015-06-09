@@ -5,7 +5,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.intellij.openapi.util.Pair;
+import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.users.SUser;
+import jetbrains.buildServer.util.ExceptionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,6 +50,23 @@ public class HostManager {
 
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
             HostBean host = load(user, filename);
+            hosts.add(host);
+        }
+        return hosts;
+    }
+
+    @NotNull
+    public static List<HostBean> list(@NotNull SUser user, @NotNull ActionErrors errors) {
+        List<HostBean> hosts = new ArrayList<>();
+
+        for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
+            HostBean host = null;
+            try {
+                host = load(user, filename);
+            } catch (JAXBException e) {
+                e.printStackTrace();
+                errors.addError(filename, ExceptionUtil.getDisplayMessage(e));
+            }
             hosts.add(host);
         }
         return hosts;
