@@ -14,9 +14,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,17 +115,27 @@ public class BasicBeanManager {
 
     @NotNull
     protected List<String> listConfigurationFiles(@NotNull SUser user, @NotNull String configFolder) {
-        List<String> files = new ArrayList<String>();
+        List<String> files = new ArrayList<>();
 
         File root = getRootFolder(user, configFolder);
         if (!root.exists()) {
             return files;
         }
-        Collections.addAll(files, root.list(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return FilenameUtils.getExtension(name).equalsIgnoreCase(CFG_EXT);
+
+        for (String filename : root.list()) {
+            if (FilenameUtils.getExtension(filename).equalsIgnoreCase(CFG_EXT)) {
+                String name = FilenameUtils.removeExtension(filename);
+
+                try {
+                    //noinspection ResultOfMethodCallIgnored
+                    UUID.fromString(name);
+                    files.add(name);
+                } catch (IllegalArgumentException e) {
+                    // skip file not matched to UUID
+                }
             }
-        }));
+        }
+
         return files;
     }
 
