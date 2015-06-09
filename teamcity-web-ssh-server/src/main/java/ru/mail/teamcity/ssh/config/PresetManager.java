@@ -52,13 +52,16 @@ public class PresetManager {
                     }
             );
 
+    protected static LoadingCache<Pair<SUser, String>, PresetBean> getCache() {
+        return cache;
+    }
+
     @Nullable
     public static PresetBean load(@NotNull SUser user, @NotNull String name) throws JAXBException {
         try {
             return cache.get(new Pair<>(user, name));
         } catch (ExecutionException e) {
-            Throwables.propagateIfPossible(
-                    e.getCause(), JAXBException.class);
+            Throwables.propagateIfPossible(e.getCause(), JAXBException.class);
             throw new IllegalStateException(e);
         }
     }
@@ -76,7 +79,7 @@ public class PresetManager {
 
     public static void save(@NotNull SUser user, PresetBean bean) throws IOException, JAXBException {
         BasicBeanManager.getInstance().save(user, CONFIG_FOLDER_NAME, bean);
-        cache.put(new Pair<>(user, bean.getId().toString()), bean);
+        cache.invalidate(new Pair<>(user, bean.getId().toString()));
     }
 
     public static void delete(@NotNull SUser user, @NotNull String name) {

@@ -68,7 +68,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
         String id = httpServletRequest.getParameter("id");
         if (null != id) {
             try {
-                bean = HostManager.load(user, id);
+                bean = HostBean.newInstance(HostManager.load(user, id));
                 String encryptedPassword = RSACipher.encryptDataForWeb(bean.getPassword());
                 bean.setEncryptedPassword(encryptedPassword);
                 bean.setPassword("");

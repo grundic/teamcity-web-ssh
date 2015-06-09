@@ -57,8 +57,8 @@ public class HostManager {
     /**
      * Load host configuration from file.
      *
-     * @param user        - Teamcity user, for whom configuration is loaded
-     * @param name        - filename of host, which configuration is loaded
+     * @param user - Teamcity user, for whom configuration is loaded
+     * @param name - filename of host, which configuration is loaded
      * @return configuration for given user/host
      * @throws JAXBException
      */
@@ -111,14 +111,31 @@ public class HostManager {
     /**
      * Save configuration to file.
      *
-     * @param user        - Teamcity user, for whom configuration is saved
-     * @param bean        - data bean, that is to be saved
+     * @param user - Teamcity user, for whom configuration is saved
+     * @param bean - data bean, that is to be saved
      * @throws IOException
      * @throws JAXBException
      */
     public static void save(@NotNull SUser user, HostBean bean) throws IOException, JAXBException {
+        PresetBean originalPreset = null;
+        HostBean originalHost;
+
+        if (null != bean.getId()) {
+            originalHost = load(user, bean.getId().toString());
+            if (null != originalHost) {
+                originalPreset = originalHost.getPreset();
+            }
+        }
+
         BasicBeanManager.getInstance().save(user, CONFIG_FOLDER_NAME, bean);
-        cache.put(new Pair<>(user, bean.getId().toString()), bean);
+        cache.invalidate(new Pair<>(user, bean.getId().toString()));
+
+        if (null != bean.getPresetId()) {
+            PresetManager.getCache().invalidate(new Pair<>(user, bean.getPresetId().toString()));
+        }
+        if (null != originalPreset) {
+            PresetManager.getCache().invalidate(new Pair<>(user, originalPreset.getId().toString()));
+        }
     }
 
     public static void delete(@NotNull SUser user, @NotNull String name) {

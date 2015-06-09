@@ -37,7 +37,7 @@ public class WebSshPresetResourceController extends AbstractController {
         }
 
         SUser user = SessionUser.getUser(request);
-        PresetBean bean = PresetManager.load(user, id);
+        PresetBean bean = PresetBean.newInstance(PresetManager.load(user, id));
         if (null != bean) {
             bean.setPassword(""); // because view is read-only - remove password at all
             bean.setHosts(Lists.<HostBean>newArrayList()); // prevent stack overflow during serialization to json

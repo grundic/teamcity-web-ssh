@@ -14,6 +14,19 @@ import java.util.List;
 @SuppressWarnings("UnusedDeclaration")
 @XmlRootElement
 public class PresetBean extends AbstractBean {
+
+    public static PresetBean newInstance(PresetBean another){
+        PresetBean bean = new PresetBean();
+        bean.setId(another.getId());
+        bean.setLogin(another.getLogin());
+        bean.setPassword(another.getPassword());
+        bean.setPrivateKey(another.getPrivateKey());
+
+        bean.setName(another.getName());
+        bean.setHosts(another.getHosts());
+        return bean;
+    }
+
     @StateField
     String name = "";
 

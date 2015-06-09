@@ -50,7 +50,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
         String id = httpServletRequest.getParameter("id");
         if (null != id) {
             try {
-                bean = PresetManager.load(user, id);
+                bean = PresetBean.newInstance(PresetManager.load(user, id));
                 String encryptedPassword = RSACipher.encryptDataForWeb(bean.getPassword());
                 bean.setEncryptedPassword(encryptedPassword);
                 bean.setPassword("");

@@ -14,8 +14,18 @@ import java.util.UUID;
 @XmlRootElement
 public class HostBean extends AbstractBean {
 
-    public HostBean() {
-        // empty constructor for JAXB
+    public static HostBean newInstance(HostBean another) {
+        HostBean bean = new HostBean();
+        bean.setId(another.getId());
+        bean.setLogin(another.getLogin());
+        bean.setPassword(another.getPassword());
+        bean.setPrivateKey(another.getPrivateKey());
+
+        bean.setPresetId(another.getPresetId());
+        bean.setPreset(another.getPreset());
+        bean.setHost(another.getHost());
+        bean.setPort(another.getPort());
+        return bean;
     }
 
     UUID presetId = null;
