@@ -5,6 +5,7 @@ import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.users.SUser;
+import jetbrains.buildServer.util.ExceptionUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildServer.web.util.SessionUser;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
 import ru.mail.teamcity.ssh.config.PresetBean;
 import ru.mail.teamcity.ssh.config.PresetManager;
+import ru.mail.teamcity.ssh.config.PresetNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +44,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
 
     @Override
     protected ModelAndView doGet(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         SUser user = SessionUser.getUser(httpServletRequest);
 
         PresetBean bean = null;
@@ -53,8 +55,8 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
                 String encryptedPassword = RSACipher.encryptDataForWeb(bean.getPassword());
                 bean.setEncryptedPassword(encryptedPassword);
                 bean.setPassword("");
-            } catch (JAXBException e) {
-                // TODO: handle error
+            } catch (JAXBException | PresetNotFoundException e) {
+                params.put("error", ExceptionUtil.getDisplayMessage(e));
                 e.printStackTrace();
             }
         }
@@ -89,9 +91,13 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
             e.printStackTrace();
             errors.addError("jaxbException", e.toString());
             return;
+        } catch (PresetNotFoundException e) {
+            e.printStackTrace();
+            errors.addError("hostNotFound", e.toString());
+            return;
         }
 
-        if (null != bean && bean.getHosts().size() > 0) {
+        if (bean.getHosts().size() > 0) {
             errors.addError("presetHostsNotEmpty", "Can't remove preset, because it is used in some hosts!");
         }
         PresetManager.delete(user, id);

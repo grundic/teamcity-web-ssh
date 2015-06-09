@@ -50,7 +50,7 @@ public class WebSshShellController extends BaseController {
     private AtmosphereFramework createAtmosphereFramework(@NotNull SshUpdateHandler sshUpdateHandler) {
         AtmosphereFramework atmosphereFramework = new AtmosphereFramework();
 
-        List<AtmosphereInterceptor> interceptors = new ArrayList<AtmosphereInterceptor>();
+        List<AtmosphereInterceptor> interceptors = new ArrayList<>();
         interceptors.add(new AtmosphereResourceLifecycleInterceptor());
         interceptors.add(new HeartbeatInterceptor());
         interceptors.add(new IdleResourceInterceptor());

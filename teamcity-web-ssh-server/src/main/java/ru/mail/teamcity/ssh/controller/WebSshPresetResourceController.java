@@ -12,9 +12,14 @@ import org.springframework.web.servlet.mvc.AbstractController;
 import ru.mail.teamcity.ssh.config.HostBean;
 import ru.mail.teamcity.ssh.config.PresetBean;
 import ru.mail.teamcity.ssh.config.PresetManager;
+import ru.mail.teamcity.ssh.config.PresetNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Author: g.chernyshev
@@ -30,19 +35,27 @@ public class WebSshPresetResourceController extends AbstractController {
     }
 
     @Override
-    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String id = request.getParameter("id");
+    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws IOException, JAXBException {
+        response.setContentType("application/json");
+
+        final String id = request.getParameter("id");
         if (null == id || StringUtil.isEmpty(id)) {
-            return null; // TODO error here
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Parameter id is missing or empty!");
+            response.getOutputStream().write(new Gson().toJson(error).getBytes());
+            return null;
         }
 
         SUser user = SessionUser.getUser(request);
-        PresetBean bean = PresetBean.newInstance(PresetManager.load(user, id));
-        if (null != bean) {
+        try {
+            PresetBean bean = PresetBean.newInstance(PresetManager.load(user, id));
             bean.setPassword(""); // because view is read-only - remove password at all
             bean.setHosts(Lists.<HostBean>newArrayList()); // prevent stack overflow during serialization to json
-            response.setContentType("application/json");
             response.getOutputStream().write(new Gson().toJson(bean).getBytes());
+        } catch (PresetNotFoundException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to load preset by " + id + " id!");
+            response.getOutputStream().write(new Gson().toJson(error).getBytes());
         }
 
         return null;

@@ -15,6 +15,7 @@ import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.teamcity.ssh.config.HostBean;
 import ru.mail.teamcity.ssh.config.HostManager;
+import ru.mail.teamcity.ssh.config.HostNotFoundException;
 import ru.mail.teamcity.ssh.shell.ShellManager;
 import ru.mail.teamcity.ssh.shell.SshConnectionInfo;
 
@@ -55,10 +56,16 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
                 host = HostManager.findHostByIp(user, ip);
             }
         } catch (JAXBException e) {
-            sendError(resource, "Xml error", "Looks, like you xml is invalid:" + e.getMessage());
             e.printStackTrace();
+            sendError(resource, "Xml error", "Looks, like you xml is invalid:" + e.getMessage());
+            return;
+        } catch (HostNotFoundException e) {
+            e.printStackTrace();
+            sendError(resource, "Host not found", "Can't find required host! Please, check parameters!");
             return;
         }
+
+
         if (null == host) {
             sendError(resource, "Can't get host! Please, check parameters 'id' or 'ip' are correct.");
             resource.getResponse().close();

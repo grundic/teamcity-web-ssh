@@ -10,7 +10,6 @@ import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.util.ExceptionUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.xml.bind.JAXBException;
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ public class PresetManager {
             build(
                     new CacheLoader<Pair<SUser, String>, PresetBean>() {
                         @Override
-                        public PresetBean load(@NotNull Pair<SUser, String> key) throws JAXBException {
+                        public PresetBean load(@NotNull Pair<SUser, String> key) throws JAXBException, PresetNotFoundException {
                             PresetBean bean = BasicBeanManager.getInstance().load(
                                     key.getFirst(), key.getSecond(), CONFIG_FOLDER_NAME, PresetBean.class
                             );
@@ -47,8 +46,10 @@ public class PresetManager {
                                     }
                                 }
                                 bean.setHosts(hosts);
+                                return bean;
+                            } else {
+                                throw new PresetNotFoundException();
                             }
-                            return bean;
                         }
                     }
             );
@@ -57,18 +58,18 @@ public class PresetManager {
         return cache;
     }
 
-    @Nullable
-    public static PresetBean load(@NotNull SUser user, @NotNull String name) throws JAXBException {
+    @NotNull
+    public static PresetBean load(@NotNull SUser user, @NotNull String name) throws JAXBException, PresetNotFoundException {
         try {
             return cache.get(new Pair<>(user, name));
         } catch (ExecutionException e) {
-            Throwables.propagateIfPossible(e.getCause(), JAXBException.class);
+            Throwables.propagateIfPossible(e.getCause(), JAXBException.class, PresetNotFoundException.class);
             throw new IllegalStateException(e);
         }
     }
 
     @NotNull
-    public static List<PresetBean> list(@NotNull SUser user) throws JAXBException {
+    public static List<PresetBean> list(@NotNull SUser user) throws JAXBException, PresetNotFoundException {
         List<PresetBean> beans = new ArrayList<>();
 
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
@@ -85,7 +86,7 @@ public class PresetManager {
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
             try {
                 beans.add(load(user, filename));
-            } catch (JAXBException e) {
+            } catch (JAXBException | PresetNotFoundException e) {
                 e.printStackTrace();
                 errors.addError(filename, ExceptionUtil.getDisplayMessage(e));
             }
@@ -103,5 +104,4 @@ public class PresetManager {
         BasicBeanManager.getInstance().delete(user, CONFIG_FOLDER_NAME, name);
         cache.invalidate(new Pair<>(user, name));
     }
-
 }

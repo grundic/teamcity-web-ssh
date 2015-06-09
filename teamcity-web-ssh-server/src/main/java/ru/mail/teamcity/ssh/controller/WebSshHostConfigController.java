@@ -1,11 +1,11 @@
 package ru.mail.teamcity.ssh.controller;
 
-import com.google.common.collect.Lists;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.users.SUser;
+import jetbrains.buildServer.util.ExceptionUtil;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
@@ -13,10 +13,7 @@ import jetbrains.buildServer.web.util.SessionUser;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
-import ru.mail.teamcity.ssh.config.HostBean;
-import ru.mail.teamcity.ssh.config.HostManager;
-import ru.mail.teamcity.ssh.config.PresetBean;
-import ru.mail.teamcity.ssh.config.PresetManager;
+import ru.mail.teamcity.ssh.config.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,14 +46,9 @@ public class WebSshHostConfigController extends BaseFormXmlController {
     protected ModelAndView doGet(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) {
         Map<String, Object> params = new HashMap<>();
         SUser user = SessionUser.getUser(httpServletRequest);
+        ActionErrors errors = new ActionErrors();
 
-        List<PresetBean> presets = Lists.newArrayList();
-        try {
-            presets = PresetManager.list(user);
-        } catch (JAXBException e) {
-            // TODO: handle error
-            e.printStackTrace();
-        }
+        List<PresetBean> presets = PresetManager.list(user, errors);
 
         HostBean bean = null;
         String id = httpServletRequest.getParameter("id");
@@ -67,8 +59,8 @@ public class WebSshHostConfigController extends BaseFormXmlController {
                 bean.setEncryptedPassword(encryptedPassword);
                 bean.setPassword("");
 
-            } catch (JAXBException e) {
-                // TODO: handle error
+            } catch (JAXBException | HostNotFoundException e) {
+                params.put("error", ExceptionUtil.getDisplayMessage(e));
                 e.printStackTrace();
             }
         }
@@ -116,6 +108,9 @@ public class WebSshHostConfigController extends BaseFormXmlController {
             HostManager.save(user, bean);
         } catch (JAXBException e) {
             errors.addError("jaxbException", e.getMessage());
+            writeErrors(element, errors);
+        } catch (HostNotFoundException e) {
+            errors.addError("hostNotFound", e.getMessage());
             writeErrors(element, errors);
         }
     }

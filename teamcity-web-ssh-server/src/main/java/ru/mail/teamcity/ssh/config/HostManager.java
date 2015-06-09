@@ -32,20 +32,24 @@ public class HostManager {
             build(
                     new CacheLoader<Pair<SUser, String>, HostBean>() {
                         @Override
-                        public HostBean load(@NotNull Pair<SUser, String> key) throws JAXBException {
+                        public HostBean load(@NotNull Pair<SUser, String> key) throws JAXBException, HostNotFoundException, PresetNotFoundException {
                             HostBean bean = HostManager.lazyLoad(key.getFirst(), key.getSecond());
-                            if (null != bean && null != bean.getPresetId()) {
-                                PresetBean preset = PresetManager.load(key.getFirst(), bean.getPresetId().toString());
-                                bean.setPreset(preset);
+                            if (null != bean) {
+                                if (null != bean.getPresetId()) {
+                                    PresetBean preset = PresetManager.load(key.getFirst(), bean.getPresetId().toString());
+                                    bean.setPreset(preset);
+                                }
+                                return bean;
+                            } else {
+                                throw new HostNotFoundException();
                             }
-                            return bean;
                         }
                     }
             );
 
 
     @NotNull
-    public static List<HostBean> list(@NotNull SUser user) throws JAXBException {
+    private static List<HostBean> list(@NotNull SUser user) throws JAXBException, HostNotFoundException {
         List<HostBean> hosts = new ArrayList<>();
 
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
@@ -62,7 +66,7 @@ public class HostManager {
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
             try {
                 hosts.add(load(user, filename));
-            } catch (JAXBException e) {
+            } catch (JAXBException | HostNotFoundException e) {
                 e.printStackTrace();
                 errors.addError(filename, ExceptionUtil.getDisplayMessage(e));
             }
@@ -78,12 +82,12 @@ public class HostManager {
      * @return configuration for given user/host
      * @throws JAXBException
      */
-    @Nullable
-    public static HostBean load(@NotNull SUser user, @NotNull String name) throws JAXBException {
+    @NotNull
+    public static HostBean load(@NotNull SUser user, @NotNull String name) throws JAXBException, HostNotFoundException {
         try {
             return cache.get(new Pair<>(user, name));
         } catch (ExecutionException e) {
-            Throwables.propagateIfPossible(e.getCause(), JAXBException.class);
+            Throwables.propagateIfPossible(e.getCause(), JAXBException.class, HostNotFoundException.class);
             throw new IllegalStateException(e);
         }
     }
@@ -103,7 +107,7 @@ public class HostManager {
     }
 
     @Nullable
-    public static HostBean findHostByIp(@NotNull SUser user, @NotNull String ip) throws JAXBException {
+    public static HostBean findHostByIp(@NotNull SUser user, @NotNull String ip) throws JAXBException, HostNotFoundException {
         InetAddress requiredIp;
 
         try {
@@ -131,15 +135,13 @@ public class HostManager {
      * @param bean - data bean, that is to be saved
      * @throws JAXBException
      */
-    public static void save(@NotNull SUser user, HostBean bean) throws JAXBException {
+    public static void save(@NotNull SUser user, HostBean bean) throws JAXBException, HostNotFoundException {
         PresetBean originalPreset = null;
         HostBean originalHost;
 
         if (null != bean.getId()) {
             originalHost = load(user, bean.getId().toString());
-            if (null != originalHost) {
-                originalPreset = originalHost.getPreset();
-            }
+            originalPreset = originalHost.getPreset();
         }
 
         BasicBeanManager.getInstance().save(user, CONFIG_FOLDER_NAME, bean);

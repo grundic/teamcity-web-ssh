@@ -35,7 +35,7 @@ public class BasicBeanManager {
     private final ConcurrentMap<String, Object> fileLock = new ConcurrentHashMap<>();
 
     @NotNull
-    private static ServerPaths serverPaths = new ApplicationContextProvider().getApplicationContext().getBean("serverPaths", ServerPaths.class);
+    private static final ServerPaths serverPaths = new ApplicationContextProvider().getApplicationContext().getBean("serverPaths", ServerPaths.class);
 
 
     private BasicBeanManager() {
