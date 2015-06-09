@@ -1,5 +1,6 @@
 package ru.mail.teamcity.ssh.controller;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.intellij.openapi.util.text.StringUtil;
 import jetbrains.buildServer.users.SUser;
@@ -8,6 +9,7 @@ import jetbrains.buildServer.web.util.SessionUser;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
+import ru.mail.teamcity.ssh.config.HostBean;
 import ru.mail.teamcity.ssh.config.PresetBean;
 import ru.mail.teamcity.ssh.config.PresetManager;
 
@@ -38,6 +40,7 @@ public class WebSshPresetResourceController extends AbstractController {
         PresetBean bean = PresetManager.load(user, id);
         if (null != bean) {
             bean.setPassword(""); // because view is read-only - remove password at all
+            bean.setHosts(Lists.<HostBean>newArrayList()); // prevent stack overflow during serialization to json
             response.setContentType("application/json");
             response.getOutputStream().write(new Gson().toJson(bean).getBytes());
         }
