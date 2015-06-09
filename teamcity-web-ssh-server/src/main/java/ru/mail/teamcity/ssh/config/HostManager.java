@@ -72,11 +72,11 @@ public class HostManager {
         }
     }
 
-    protected static HostBean lazyLoad(@NotNull SUser user, @NotNull String name) throws JAXBException {
+    private static HostBean lazyLoad(@NotNull SUser user, @NotNull String name) throws JAXBException {
         return BasicBeanManager.getInstance().load(user, name, CONFIG_FOLDER_NAME, HostBean.class);
     }
 
-    protected static List<HostBean> lazyList(@NotNull SUser user) throws JAXBException {
+    static List<HostBean> lazyList(@NotNull SUser user) throws JAXBException {
         List<HostBean> hosts = new ArrayList<>();
 
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {

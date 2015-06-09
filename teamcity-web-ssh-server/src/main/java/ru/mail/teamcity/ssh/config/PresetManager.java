@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class PresetManager {
     @NotNull
-    protected static String CONFIG_FOLDER_NAME = "presets";
+    private static String CONFIG_FOLDER_NAME = "presets";
 
     private final static LoadingCache<Pair<SUser, String>, PresetBean> cache = CacheBuilder.
             newBuilder().
@@ -52,7 +52,7 @@ public class PresetManager {
                     }
             );
 
-    protected static LoadingCache<Pair<SUser, String>, PresetBean> getCache() {
+    static LoadingCache<Pair<SUser, String>, PresetBean> getCache() {
         return cache;
     }
 

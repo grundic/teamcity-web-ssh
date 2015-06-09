@@ -41,7 +41,7 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
         }
     }
 
-    public void onOpen(AtmosphereResource resource) throws IOException {
+    private void onOpen(AtmosphereResource resource) throws IOException {
         SUser user = SessionUser.getUser(resource.getRequest());
         HostBean host = null;
 
@@ -91,7 +91,7 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
     }
 
 
-    public void onMessage(AtmosphereResponse response, String message) throws IOException {
+    private void onMessage(AtmosphereResponse response, String message) throws IOException {
         if (StringUtils.isNotEmpty(message)) {
             Type type = new TypeToken<Map<String, String>>() {
             }.getType();
@@ -134,14 +134,14 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
     }
 
 
-    public void onResume(AtmosphereResponse response) throws IOException {
+    private void onResume(AtmosphereResponse response) throws IOException {
     }
 
-    public void onTimeout(AtmosphereResponse response) throws IOException {
+    private void onTimeout(AtmosphereResponse response) throws IOException {
         close(response.resource());
     }
 
-    public void onDisconnect(AtmosphereResponse response) throws IOException {
+    private void onDisconnect(AtmosphereResponse response) throws IOException {
         close(response.resource());
     }
 

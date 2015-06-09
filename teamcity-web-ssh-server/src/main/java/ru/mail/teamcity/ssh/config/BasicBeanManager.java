@@ -106,7 +106,7 @@ public class BasicBeanManager {
     }
 
     @NotNull
-    protected File getConfigurationFile(@NotNull SUser user, @NotNull String name, @NotNull String configFolder) {
+    private File getConfigurationFile(@NotNull SUser user, @NotNull String name, @NotNull String configFolder) {
         if (!FilenameUtils.getExtension(name).equalsIgnoreCase(CFG_EXT)) {
             name += "." + CFG_EXT;
         }
@@ -114,7 +114,7 @@ public class BasicBeanManager {
     }
 
     @NotNull
-    protected List<String> listConfigurationFiles(@NotNull SUser user, @NotNull String configFolder) {
+    List<String> listConfigurationFiles(@NotNull SUser user, @NotNull String configFolder) {
         List<String> files = new ArrayList<>();
 
         File root = getRootFolder(user, configFolder);
@@ -140,7 +140,7 @@ public class BasicBeanManager {
     }
 
     @Nullable
-    protected <T extends AbstractBean> T load(@NotNull SUser user, @NotNull String name, @NotNull String configFolder, Class<T> type) throws JAXBException {
+    <T extends AbstractBean> T load(@NotNull SUser user, @NotNull String name, @NotNull String configFolder, Class<T> type) throws JAXBException {
         File hostConfig = BasicBeanManager.getInstance().getConfigurationFile(user, name, configFolder);
         if (!hostConfig.exists()) {
             return null;
@@ -148,7 +148,7 @@ public class BasicBeanManager {
         return type.cast(read(hostConfig));
     }
 
-    protected void save(@NotNull SUser user, @NotNull String configFolder, @NotNull AbstractBean bean) throws JAXBException {
+    void save(@NotNull SUser user, @NotNull String configFolder, @NotNull AbstractBean bean) throws JAXBException {
         if (null == bean.getId()) {
             bean.setId(UUID.randomUUID());
         }
@@ -158,7 +158,7 @@ public class BasicBeanManager {
         write(hostConfig, bean);
     }
 
-    protected void delete(@NotNull SUser user, @NotNull String configFolder, @NotNull String name) {
+    void delete(@NotNull SUser user, @NotNull String configFolder, @NotNull String name) {
         File hostConfig = BasicBeanManager.getInstance().getConfigurationFile(user, name, configFolder);
         if (hostConfig.exists()) {
             hostConfig.delete();

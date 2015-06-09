@@ -37,7 +37,7 @@ public class ShellManager {
         add(user, resource.uuid(), new SshConnectionInfo(shellChannel, thread));
     }
 
-    public static synchronized void add(@NotNull SUser user, @NotNull String uuid, @NotNull SshConnectionInfo connectionInfo) {
+    private static synchronized void add(@NotNull SUser user, @NotNull String uuid, @NotNull SshConnectionInfo connectionInfo) {
         userShells.put(user.getId(), uuid, connectionInfo);
     }
 
