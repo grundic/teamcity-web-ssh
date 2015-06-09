@@ -24,7 +24,6 @@ public class ShellOutputProcessor extends Thread {
     }
 
     public void run() {
-        System.out.println("Starting thread " + this);
 
         byte[] buff = new byte[5120];
         int count;

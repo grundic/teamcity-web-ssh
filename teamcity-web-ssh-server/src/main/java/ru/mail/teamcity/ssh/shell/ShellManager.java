@@ -61,8 +61,6 @@ public class ShellManager {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("Thread successfully stopped.");
-
 
         userShells.remove(user.getId(), uuid);
     }
