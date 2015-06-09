@@ -34,8 +34,8 @@ public class HostManager {
                         public HostBean load(@NotNull Pair<SUser, String> key) throws JAXBException {
                             HostBean bean = HostManager.lazyLoad(key.getFirst(), key.getSecond());
                             if (null != bean && null != bean.getPresetId()) {
-//                                PresetBean preset = PresetManager.load(key.getFirst(), key.getSecond(), bean.getPresetId().toString());
-//                                bean.setPreset(preset);
+                                PresetBean preset = PresetManager.load(key.getFirst(), bean.getPresetId().toString());
+                                bean.setPreset(preset);
                             }
                             return bean;
                         }
