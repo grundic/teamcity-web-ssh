@@ -49,7 +49,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
 
         PresetBean bean = null;
         String id = httpServletRequest.getParameter("id");
-        if (null != id) {
+        if (id != null) {
             try {
                 bean = PresetBean.newInstance(PresetManager.load(user, id));
                 String encryptedPassword = RSACipher.encryptDataForWeb(bean.getPassword());
@@ -60,7 +60,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
                 e.printStackTrace();
             }
         }
-        bean = null == bean ? new PresetBean() : bean;
+        bean = (bean == null) ? new PresetBean() : bean;
 
         params.put("bean", bean);
         return new ModelAndView(pluginDescriptor.getPluginResourcesPath("webSshPresetConfigDialog.jsp"), params);
@@ -69,7 +69,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
     @Override
     protected void doPost(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Element element) {
         String delete = httpServletRequest.getParameter("delete");
-        if (null != delete && delete.equalsIgnoreCase("true")) {
+        if (delete.equalsIgnoreCase("true")) {
             delete(httpServletRequest);
         } else {
             save(httpServletRequest, element);
@@ -79,7 +79,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
     private void delete(@NotNull HttpServletRequest httpServletRequest) {
         ActionErrors errors = new ActionErrors();
         String id = httpServletRequest.getParameter("id");
-        if (null == id) {
+        if (id == null) {
             return;
         }
         SUser user = SessionUser.getUser(httpServletRequest);
@@ -97,7 +97,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
             return;
         }
 
-        if (bean.getHosts().size() > 0) {
+        if (!bean.getHosts().isEmpty()) {
             errors.addError("presetHostsNotEmpty", "Can't remove preset, because it is used in some hosts!");
         }
         PresetManager.delete(user, id);

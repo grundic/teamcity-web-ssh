@@ -15,8 +15,11 @@ import java.util.Collection;
  * Author: g.chernyshev
  * Date: 26.05.15
  */
-public class ShellManager {
+public final class ShellManager {
     private static final Table<Long, String, SshConnectionInfo> userShells = HashBasedTable.create();
+
+    private ShellManager() {
+    }
 
     public static void createSshConnection(@NotNull SUser user, @NotNull HostBean host, @NotNull AtmosphereResource resource) throws IOException, JSchException {
         JSch jsch = new JSch();

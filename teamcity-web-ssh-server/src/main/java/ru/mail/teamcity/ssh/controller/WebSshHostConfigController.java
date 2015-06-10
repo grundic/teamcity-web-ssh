@@ -52,7 +52,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
 
         HostBean bean = null;
         String id = httpServletRequest.getParameter("id");
-        if (null != id) {
+        if (id != null) {
             try {
                 bean = HostBean.newInstance(HostManager.load(user, id));
                 String encryptedPassword = RSACipher.encryptDataForWeb(bean.getPassword());
@@ -64,7 +64,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
                 e.printStackTrace();
             }
         }
-        bean = null == bean ? new HostBean() : bean;
+        bean = (bean == null) ? new HostBean() : bean;
 
         params.put("bean", bean);
         params.put("presets", presets);
@@ -74,7 +74,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
     @Override
     protected void doPost(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Element element) {
         String delete = httpServletRequest.getParameter("delete");
-        if (null != delete && delete.equalsIgnoreCase("true")) {
+        if ((delete != null) && delete.equalsIgnoreCase("true")) {
             delete(httpServletRequest);
         } else {
             save(httpServletRequest, element);
@@ -83,7 +83,7 @@ public class WebSshHostConfigController extends BaseFormXmlController {
 
     private void delete(@NotNull HttpServletRequest httpServletRequest) {
         String id = httpServletRequest.getParameter("id");
-        if (null == id) {
+        if (id == null) {
             return;
         }
         SUser user = SessionUser.getUser(httpServletRequest);

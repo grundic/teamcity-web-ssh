@@ -22,11 +22,14 @@ import java.util.concurrent.TimeUnit;
  * Date: 03/06/15
  * Time: 00:36
  */
-public class PresetManager {
+public final class PresetManager {
     @NotNull
     private static final String CONFIG_FOLDER_NAME = "presets";
 
-    private final static LoadingCache<Pair<SUser, String>, PresetBean> cache = CacheBuilder.
+    private PresetManager() {
+    }
+
+    private static final LoadingCache<Pair<SUser, String>, PresetBean> cache = CacheBuilder.
             newBuilder().
             expireAfterAccess(12, TimeUnit.HOURS).
             build(
@@ -37,10 +40,10 @@ public class PresetManager {
                                     key.getFirst(), key.getSecond(), CONFIG_FOLDER_NAME, PresetBean.class
                             );
 
-                            if (null != bean) {
+                            if (bean != null) {
                                 List<HostBean> hosts = Lists.newArrayList();
                                 for (HostBean host : HostManager.lazyList(key.getFirst())) {
-                                    if (null != host.getPresetId() && host.getPresetId().equals(bean.getId())) {
+                                    if ((host.getPresetId() != null) && host.getPresetId().equals(bean.getId())) {
                                         host.setPreset(bean);
                                         hosts.add(host);
                                     }

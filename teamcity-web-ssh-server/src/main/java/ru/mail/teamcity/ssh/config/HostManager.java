@@ -23,10 +23,13 @@ import java.util.concurrent.TimeUnit;
  * Author: g.chernyshev
  * Date: 02.06.15
  */
-public class HostManager {
+public final class HostManager {
     private static final String CONFIG_FOLDER_NAME = "hosts";
 
-    private final static LoadingCache<Pair<SUser, String>, HostBean> cache = CacheBuilder.
+    private HostManager() {
+    }
+
+    private static final LoadingCache<Pair<SUser, String>, HostBean> cache = CacheBuilder.
             newBuilder().
             expireAfterAccess(12, TimeUnit.HOURS).
             build(
@@ -34,8 +37,8 @@ public class HostManager {
                         @Override
                         public HostBean load(@NotNull Pair<SUser, String> key) throws JAXBException, HostNotFoundException, PresetNotFoundException {
                             HostBean bean = HostManager.lazyLoad(key.getFirst(), key.getSecond());
-                            if (null != bean) {
-                                if (null != bean.getPresetId()) {
+                            if (bean != null) {
+                                if (bean.getPresetId() != null) {
                                     PresetBean preset = PresetManager.load(key.getFirst(), bean.getPresetId().toString());
                                     bean.setPreset(preset);
                                 }
@@ -46,7 +49,6 @@ public class HostManager {
                         }
                     }
             );
-
 
     @NotNull
     private static List<HostBean> list(@NotNull SUser user) throws JAXBException, HostNotFoundException {
@@ -137,20 +139,19 @@ public class HostManager {
      */
     public static void save(@NotNull SUser user, HostBean bean) throws JAXBException, HostNotFoundException {
         PresetBean originalPreset = null;
-        HostBean originalHost;
 
-        if (null != bean.getId()) {
-            originalHost = load(user, bean.getId().toString());
+        if (bean.getId() != null) {
+            HostBean originalHost = load(user, bean.getId().toString());
             originalPreset = originalHost.getPreset();
         }
 
         BasicBeanManager.getInstance().save(user, CONFIG_FOLDER_NAME, bean);
         cache.invalidate(new Pair<>(user, bean.getId().toString()));
 
-        if (null != bean.getPresetId()) {
+        if (bean.getPresetId() != null) {
             PresetManager.getCache().invalidate(new Pair<>(user, bean.getPresetId().toString()));
         }
-        if (null != originalPreset) {
+        if (originalPreset != null) {
             PresetManager.getCache().invalidate(new Pair<>(user, originalPreset.getId().toString()));
         }
     }

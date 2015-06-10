@@ -37,16 +37,16 @@ public class AgentWebSshExtension extends SimplePageExtension {
     @Override
     public boolean isAvailable(@NotNull HttpServletRequest request) {
         SBuildAgent agent = getAgent(request);
-        return (agent != null);
+        return agent != null;
     }
 
     @Override
     public void fillModel(@NotNull Map<String, Object> model, @NotNull HttpServletRequest request) {
         SBuildAgent agent = getAgent(request);
-        if (null != agent) {
+        if (agent != null) {
             String ip = agent.getHostAddress();
             String publicIp = agent.getBuildParameters().get("system.ec2.public-hostname");
-            if (null != publicIp) {
+            if (publicIp != null) {
                 ip = publicIp;
             }
             model.put("agentIp", ip);
@@ -57,6 +57,6 @@ public class AgentWebSshExtension extends SimplePageExtension {
 
     @Nullable
     private SBuildAgent getAgent(HttpServletRequest request) {
-        return AgentFinderUtil.findAgent(request, this.agentManager);
+        return AgentFinderUtil.findAgent(request, agentManager);
     }
 }

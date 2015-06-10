@@ -57,7 +57,7 @@ public class HostBean extends AbstractBean {
 
     @XmlTransient
     public AbstractBean getDelegate() {
-        return preset == null ? this : preset;
+        return (preset == null) ? this : preset;
     }
 
     public String getHost() {

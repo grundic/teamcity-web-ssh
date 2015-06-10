@@ -32,7 +32,7 @@ public class WebSshShellPage extends BaseController {
 
     @Nullable
     @Override
-    protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) throws Exception {
+    protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) {
         Map<String, Object> params = new HashMap<>();
         params.put("queryString", httpServletRequest.getQueryString());
         return new ModelAndView(pluginDescriptor.getPluginResourcesPath("webSshShell.jsp"), params);

@@ -6,5 +6,5 @@ package ru.mail.teamcity.ssh;
  * Time: 01:45
  */
 public class AppConfiguration {
-    public final static String PLUGIN_NAME = "web-ssh";
+    public static final String PLUGIN_NAME = "web-ssh";
 }

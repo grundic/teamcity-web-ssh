@@ -16,8 +16,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,13 +37,13 @@ public class WebSshShellController extends BaseController {
             @NotNull WebControllerManager webControllerManager
     ) {
         super(server);
-        this.atmosphereFramework = createAtmosphereFramework(sshUpdateHandler);
+        atmosphereFramework = createAtmosphereFramework(sshUpdateHandler);
         webControllerManager.registerController("/webSsh.html", this);
     }
 
     @Nullable
     @Override
-    protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) throws Exception {
+    protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) throws IOException, ServletException {
         httpServletRequest.setAttribute("org.apache.catalina.ASYNC_SUPPORTED", Boolean.TRUE);
         atmosphereFramework.doCometSupport(AtmosphereRequest.wrap(httpServletRequest), AtmosphereResponse.wrap(httpServletResponse));
         return null;

@@ -39,7 +39,7 @@ public class WebSshPresetResourceController extends AbstractController {
         response.setContentType("application/json");
 
         final String id = request.getParameter("id");
-        if (null == id || StringUtil.isEmpty(id)) {
+        if ((id == null) || StringUtil.isEmpty(id)) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "Parameter id is missing or empty!");
             response.getOutputStream().write(new Gson().toJson(error).getBytes());

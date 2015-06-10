@@ -15,7 +15,7 @@ public class ShellOutputProcessor extends Thread {
 
     private final InputStream outFromChannel;
     private final AtmosphereResource resource;
-    private volatile boolean running = true;
+    private volatile boolean terminated = false;
 
 
     public ShellOutputProcessor(InputStream outFromChannel, AtmosphereResource resource) {
@@ -23,13 +23,14 @@ public class ShellOutputProcessor extends Thread {
         this.resource = resource;
     }
 
+    @Override
     public void run() {
 
-        byte[] buff = new byte[5120];
-        int count;
         try {
+            byte[] buff = new byte[5120];
+            int count;
             while ((count = outFromChannel.read(buff)) != -1) {
-                if (!running) {
+                if (terminated) {
                     break;
                 }
                 String chunk = new String(buff, 0, count);
@@ -41,6 +42,6 @@ public class ShellOutputProcessor extends Thread {
     }
 
     public void terminate() {
-        running = false;
+        terminated = true;
     }
 }

@@ -34,6 +34,7 @@ import java.util.Map;
  */
 public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
 
+    @Override
     public void onRequest(AtmosphereResource resource) throws IOException {
         if (resource.getRequest().getMethod().equalsIgnoreCase("GET")) {
             onOpen(resource);
@@ -50,9 +51,9 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
         String ip = resource.getRequest().getParameter("ip");
 
         try {
-            if (null != id && StringUtils.isNotEmpty(id)) {
+            if ((id != null) && StringUtils.isNotEmpty(id)) {
                 host = HostManager.load(user, id);
-            } else if (null != ip && StringUtils.isNotEmpty(ip)) {
+            } else if ((ip != null) && StringUtils.isNotEmpty(ip)) {
                 host = HostManager.findHostByIp(user, ip);
             }
         } catch (JAXBException e) {
@@ -66,7 +67,7 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
         }
 
 
-        if (null == host) {
+        if (host == null) {
             sendError(resource, "Can't get host! Please, check parameters 'id' or 'ip' are correct.");
             resource.getResponse().close();
             return;
@@ -85,9 +86,8 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
 
     private void doPost(AtmosphereResource resource) throws IOException {
         StringBuilder data = new StringBuilder();
-        BufferedReader requestReader;
 
-        requestReader = resource.getRequest().getReader();
+        BufferedReader requestReader = resource.getRequest().getReader();
         char[] buf = new char[5120];
         int read;
         while ((read = requestReader.read(buf)) > 0) {
@@ -107,11 +107,11 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
 
             String stdin = jsonRoot.get("stdin");
             String uuid = response.resource().uuid();
-            if (null == uuid) {
+            if (uuid == null) {
                 return;
             }
             SshConnectionInfo connectionInfo = ShellManager.get(user, response.resource().uuid());
-            if (null == connectionInfo) {
+            if (connectionInfo == null) {
                 return;
             }
             PrintStream inputToChannel = new PrintStream(connectionInfo.getChannel().getOutputStream(), true);
@@ -120,12 +120,12 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
     }
 
     @Override
-    public final void onStateChange(AtmosphereResourceEvent event) throws IOException {
+    public void onStateChange(AtmosphereResourceEvent event) throws IOException {
         AtmosphereResponse response = ((AtmosphereResourceImpl) event.getResource()).getResponse(false);
 
         if (event.isCancelled() || event.isClosedByApplication() || event.isClosedByClient()) {
             onDisconnect(response);
-        } else if (event.getMessage() != null && List.class.isAssignableFrom(event.getMessage().getClass())) {
+        } else if ((event.getMessage() != null) && List.class.isAssignableFrom(event.getMessage().getClass())) {
             List<String> messages = List.class.cast(event.getMessage());
             for (String message : messages) {
                 onMessage(response, message);
@@ -155,7 +155,7 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
     private void close(AtmosphereResource resource) {
         SUser user = SessionUser.getUser(resource.getRequest());
         String uuid = resource.uuid();
-        if (null == uuid) {
+        if (uuid == null) {
             return;
         }
         ShellManager.terminate(user, uuid);

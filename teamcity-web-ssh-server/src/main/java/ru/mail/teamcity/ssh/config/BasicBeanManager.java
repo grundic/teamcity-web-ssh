@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentMap;
  * Author: g.chernyshev
  * Date: 02.06.15
  */
-public class BasicBeanManager {
+public final class BasicBeanManager {
 
     private static BasicBeanManager instance = null;
 
@@ -106,10 +106,8 @@ public class BasicBeanManager {
 
     @NotNull
     private File getConfigurationFile(@NotNull SUser user, @NotNull String name, @NotNull String configFolder) {
-        if (!FilenameUtils.getExtension(name).equalsIgnoreCase(CFG_EXT)) {
-            name += "." + CFG_EXT;
-        }
-        return new File(getRootFolder(user, configFolder), name);
+        String filename = FilenameUtils.getExtension(name).equalsIgnoreCase(CFG_EXT) ? name : (name + "." + CFG_EXT);
+        return new File(getRootFolder(user, configFolder), filename);
     }
 
     @NotNull
@@ -140,7 +138,7 @@ public class BasicBeanManager {
 
     @Nullable
     <T extends AbstractBean> T load(@NotNull SUser user, @NotNull String name, @NotNull String configFolder, Class<T> type) throws JAXBException {
-        File hostConfig = BasicBeanManager.getInstance().getConfigurationFile(user, name, configFolder);
+        File hostConfig = getInstance().getConfigurationFile(user, name, configFolder);
         if (!hostConfig.exists()) {
             return null;
         }
@@ -148,17 +146,17 @@ public class BasicBeanManager {
     }
 
     void save(@NotNull SUser user, @NotNull String configFolder, @NotNull AbstractBean bean) throws JAXBException {
-        if (null == bean.getId()) {
+        if (bean.getId() == null) {
             bean.setId(UUID.randomUUID());
         }
 
-        File hostConfig = BasicBeanManager.getInstance().getConfigurationFile(user, bean.getId().toString(), configFolder);
+        File hostConfig = getInstance().getConfigurationFile(user, bean.getId().toString(), configFolder);
         hostConfig.getParentFile().mkdirs();
         write(hostConfig, bean);
     }
 
     void delete(@NotNull SUser user, @NotNull String configFolder, @NotNull String name) {
-        File hostConfig = BasicBeanManager.getInstance().getConfigurationFile(user, name, configFolder);
+        File hostConfig = getInstance().getConfigurationFile(user, name, configFolder);
         if (hostConfig.exists()) {
             hostConfig.delete();
         }
