@@ -229,7 +229,7 @@ public final class BasicBeanManager {
             bean.setId(UUID.randomUUID());
         }
 
-        File hostConfig = getInstance().getConfigurationFile(user, bean.getId().toString(), configFolder);
+        File hostConfig = getInstance().getConfigurationFile(user, configFolder, bean.getId().toString());
         hostConfig.getParentFile().mkdirs();
         write(hostConfig, bean);
     }
