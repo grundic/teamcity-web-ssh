@@ -137,14 +137,16 @@ public class WebSshHostConfigController extends BaseFormXmlController {
             errors.addError("badPortValue", "Port should be positive number.");
         }
 
-        // Login validation
-        if (StringUtil.isEmptyOrSpaces(bean.getLogin())) {
-            errors.addError("emptyLogin", "Login could not be empty.");
-        }
+        if (bean.getPresetId() == null) {
+            // Login validation
+            if (StringUtil.isEmptyOrSpaces(bean.getLogin())) {
+                errors.addError("emptyLogin", "Login could not be empty.");
+            }
 
-        // Password validation
-        if (StringUtil.isEmptyOrSpaces(bean.getPassword())) {
-            errors.addError("emptyPassword", "Password could not be empty.");
+            // Password validation
+            if (StringUtil.isEmptyOrSpaces(bean.getPassword())) {
+                errors.addError("emptyPassword", "Password could not be empty.");
+            }
         }
 
         return errors;
