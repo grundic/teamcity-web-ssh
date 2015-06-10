@@ -8,6 +8,8 @@ This innovative plugin adds possibility to access any host, running SSH daemon, 
 Main purpose of it is to simplify access to remote hosts: in case of any problems or necessity to access your build agent
 or TeamCity server you can perform this from your browser.
 
+![demo](https://github.com/grundic/teamcity-web-ssh/blob/master/demo/teamcity-web-ssh.gif?raw=true)
+
 Installation
 ------------
 To install plugin [download zip archive](https://github.com/grundic/teamcity-web-ssh/releases) 
