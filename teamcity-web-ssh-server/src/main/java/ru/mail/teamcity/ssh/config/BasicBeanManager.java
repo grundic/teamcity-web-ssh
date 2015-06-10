@@ -199,7 +199,6 @@ public final class BasicBeanManager {
     /**
      * Returns unmarshalled object of type <code>T<code/>, loaded from specified path.
      *
-     * @param <T>
      * @param user user account to get config for
      * @param configFolder name of the root configuration folder
      * @param name name of config file
