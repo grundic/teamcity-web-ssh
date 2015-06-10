@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Manager for working with host configs.
+ * <p/>
  * Author: g.chernyshev
  * Date: 02.06.15
  */
@@ -50,8 +52,47 @@ public final class HostManager {
                     }
             );
 
+    /**
+     * Load host configuration from file.
+     *
+     * @param user user account, for whom configuration is loaded
+     * @param name filename of host, which configuration is loaded
+     * @return configuration for given user/host
+     * @throws JAXBException
+     */
     @NotNull
-    private static List<HostBean> list(@NotNull SUser user) throws JAXBException, HostNotFoundException {
+    public static HostBean load(@NotNull SUser user, @NotNull String name) throws JAXBException, HostNotFoundException {
+        try {
+            return cache.get(new Pair<>(user, name));
+        } catch (ExecutionException e) {
+            Throwables.propagateIfPossible(e.getCause(), JAXBException.class, HostNotFoundException.class);
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Lazy load host configuration from file.
+     * This method doesn't use cache and doesn't load preset of the host.
+     *
+     * @param user user account, for whom configuration is loaded
+     * @param name filename of host, which configuration is loaded
+     * @return
+     * @throws JAXBException
+     */
+    private static HostBean lazyLoad(@NotNull SUser user, @NotNull String name) throws JAXBException {
+        return BasicBeanManager.getInstance().load(user, CONFIG_FOLDER_NAME, name, HostBean.class);
+    }
+
+    /**
+     * Return list of available hosts for specific user.
+     *
+     * @param user user account
+     * @return list of available hosts for specific user
+     * @throws JAXBException
+     * @throws HostNotFoundException
+     */
+    @NotNull
+    static List<HostBean> list(@NotNull SUser user) throws JAXBException, HostNotFoundException {
         List<HostBean> hosts = new ArrayList<>();
 
         for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
@@ -61,6 +102,32 @@ public final class HostManager {
         return hosts;
     }
 
+    /**
+     * Return list of available hosts for specific user.
+     * This method doesn't use cache and doesn't load preset of the host.
+     *
+     * @param user user account
+     * @return list of available hosts for specific user
+     * @throws JAXBException
+     */
+    static List<HostBean> lazyList(@NotNull SUser user) throws JAXBException {
+        List<HostBean> hosts = new ArrayList<>();
+
+        for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
+            HostBean host = lazyLoad(user, filename);
+            hosts.add(host);
+        }
+        return hosts;
+    }
+
+    /**
+     * Return list of available hosts for specific user.
+     * This method doesn't throws an exception, instead it fill errors container.
+     *
+     * @param user   user account
+     * @param errors error container
+     * @return list of available hosts for specific user
+     */
     @NotNull
     public static List<HostBean> list(@NotNull SUser user, @NotNull ActionErrors errors) {
         List<HostBean> hosts = new ArrayList<>();
@@ -77,37 +144,14 @@ public final class HostManager {
     }
 
     /**
-     * Load host configuration from file.
+     * Returns host, matching specified ip address.
      *
-     * @param user - Teamcity user, for whom configuration is loaded
-     * @param name - filename of host, which configuration is loaded
-     * @return configuration for given user/host
+     * @param user user account
+     * @param ip ip address
+     * @return host if it's found or null
      * @throws JAXBException
+     * @throws HostNotFoundException
      */
-    @NotNull
-    public static HostBean load(@NotNull SUser user, @NotNull String name) throws JAXBException, HostNotFoundException {
-        try {
-            return cache.get(new Pair<>(user, name));
-        } catch (ExecutionException e) {
-            Throwables.propagateIfPossible(e.getCause(), JAXBException.class, HostNotFoundException.class);
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private static HostBean lazyLoad(@NotNull SUser user, @NotNull String name) throws JAXBException {
-        return BasicBeanManager.getInstance().load(user, name, CONFIG_FOLDER_NAME, HostBean.class);
-    }
-
-    static List<HostBean> lazyList(@NotNull SUser user) throws JAXBException {
-        List<HostBean> hosts = new ArrayList<>();
-
-        for (String filename : BasicBeanManager.getInstance().listConfigurationFiles(user, CONFIG_FOLDER_NAME)) {
-            HostBean host = lazyLoad(user, filename);
-            hosts.add(host);
-        }
-        return hosts;
-    }
-
     @Nullable
     public static HostBean findHostByIp(@NotNull SUser user, @NotNull String ip) throws JAXBException, HostNotFoundException {
         InetAddress requiredIp;
@@ -133,8 +177,8 @@ public final class HostManager {
     /**
      * Save configuration to file.
      *
-     * @param user - Teamcity user, for whom configuration is saved
-     * @param bean - data bean, that is to be saved
+     * @param user user account
+     * @param bean data bean, that is to be saved
      * @throws JAXBException
      */
     public static void save(@NotNull SUser user, HostBean bean) throws JAXBException, HostNotFoundException {
@@ -156,6 +200,12 @@ public final class HostManager {
         }
     }
 
+    /**
+     * Remove specified host config.
+     *
+     * @param user user account
+     * @param name name of config to remove
+     */
     public static void delete(@NotNull SUser user, @NotNull String name) {
         BasicBeanManager.getInstance().delete(user, CONFIG_FOLDER_NAME, name);
         cache.invalidate(new Pair<>(user, name));

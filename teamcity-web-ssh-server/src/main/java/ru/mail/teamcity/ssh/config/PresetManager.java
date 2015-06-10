@@ -37,7 +37,7 @@ public final class PresetManager {
                         @Override
                         public PresetBean load(@NotNull Pair<SUser, String> key) throws JAXBException, PresetNotFoundException {
                             PresetBean bean = BasicBeanManager.getInstance().load(
-                                    key.getFirst(), key.getSecond(), CONFIG_FOLDER_NAME, PresetBean.class
+                                    key.getFirst(), CONFIG_FOLDER_NAME, key.getSecond(), PresetBean.class
                             );
 
                             if (bean != null) {
@@ -61,6 +61,15 @@ public final class PresetManager {
         return cache;
     }
 
+    /**
+     * Load preset configuration from file.
+     *
+     * @param user user account
+     * @param name name of config
+     * @return loaded preset
+     * @throws JAXBException
+     * @throws PresetNotFoundException
+     */
     @NotNull
     public static PresetBean load(@NotNull SUser user, @NotNull String name) throws JAXBException, PresetNotFoundException {
         try {
@@ -71,6 +80,14 @@ public final class PresetManager {
         }
     }
 
+    /**
+     * Return list of available presets for specific user.
+     *
+     * @param user user account
+     * @return list of available presets for specific user
+     * @throws JAXBException
+     * @throws PresetNotFoundException
+     */
     @NotNull
     public static List<PresetBean> list(@NotNull SUser user) throws JAXBException, PresetNotFoundException {
         List<PresetBean> beans = new ArrayList<>();
@@ -82,6 +99,14 @@ public final class PresetManager {
         return beans;
     }
 
+    /**
+     * Return list of available presets for specific user.
+     * This method doesn't throws an exception, instead it fill errors container.
+     *
+     * @param user   user account
+     * @param errors error container
+     * @return list of available presets for specific user
+     */
     @NotNull
     public static List<PresetBean> list(@NotNull SUser user, @NotNull ActionErrors errors) {
         List<PresetBean> beans = new ArrayList<>();
@@ -98,11 +123,24 @@ public final class PresetManager {
     }
 
 
+    /**
+     * Save configuration to file.
+     *
+     * @param user user account
+     * @param bean data bean, that is to be saved
+     * @throws JAXBException
+     */
     public static void save(@NotNull SUser user, PresetBean bean) throws JAXBException {
         BasicBeanManager.getInstance().save(user, CONFIG_FOLDER_NAME, bean);
         cache.invalidate(new Pair<>(user, bean.getId().toString()));
     }
 
+    /**
+     * Remove specified preset config.
+     *
+     * @param user user account
+     * @param name name of config to remove
+     */
     public static void delete(@NotNull SUser user, @NotNull String name) {
         BasicBeanManager.getInstance().delete(user, CONFIG_FOLDER_NAME, name);
         cache.invalidate(new Pair<>(user, name));
