@@ -75,20 +75,29 @@ public class WebSshHostConfigController extends BaseFormXmlController {
     protected void doPost(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Element element) {
         String delete = httpServletRequest.getParameter("delete");
         if ((delete != null) && delete.equalsIgnoreCase("true")) {
-            delete(httpServletRequest);
+            delete(httpServletRequest, element);
         } else {
             save(httpServletRequest, element);
         }
     }
 
-    private void delete(@NotNull HttpServletRequest httpServletRequest) {
+    private void delete(@NotNull HttpServletRequest httpServletRequest, @NotNull Element element) {
         String id = httpServletRequest.getParameter("id");
         if (id == null) {
             return;
         }
         SUser user = SessionUser.getUser(httpServletRequest);
+        ActionErrors errors = new ActionErrors();
 
-        HostManager.delete(user, id);
+        try {
+            HostManager.delete(user, id);
+        } catch (JAXBException e) {
+            errors.addError("jaxbException", e.getMessage());
+            writeErrors(element, errors);
+        } catch (HostNotFoundException e) {
+            errors.addError("hostNotFound", e.getMessage());
+            writeErrors(element, errors);
+        }
     }
 
     private void save(@NotNull HttpServletRequest httpServletRequest, @NotNull Element element) {

@@ -69,7 +69,7 @@ public class WebSshPresetConfigController extends BaseFormXmlController {
     @Override
     protected void doPost(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Element element) {
         String delete = httpServletRequest.getParameter("delete");
-        if (delete.equalsIgnoreCase("true")) {
+        if (delete != null && delete.equalsIgnoreCase("true")) {
             delete(httpServletRequest);
         } else {
             save(httpServletRequest, element);

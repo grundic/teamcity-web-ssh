@@ -147,7 +147,7 @@ public final class HostManager {
      * Returns host, matching specified ip address.
      *
      * @param user user account
-     * @param ip ip address
+     * @param ip   ip address
      * @return host if it's found or null
      * @throws JAXBException
      * @throws HostNotFoundException
@@ -206,9 +206,15 @@ public final class HostManager {
      * @param user user account
      * @param name name of config to remove
      */
-    public static void delete(@NotNull SUser user, @NotNull String name) {
+    public static void delete(@NotNull SUser user, @NotNull String name) throws JAXBException, HostNotFoundException {
+        HostBean bean = load(user, name);
+
         BasicBeanManager.getInstance().delete(user, CONFIG_FOLDER_NAME, name);
         cache.invalidate(new Pair<>(user, name));
+
+        if (bean.getPresetId() != null) {
+            PresetManager.getCache().invalidate(new Pair<>(user, bean.getPresetId().toString()));
+        }
     }
 }
 
