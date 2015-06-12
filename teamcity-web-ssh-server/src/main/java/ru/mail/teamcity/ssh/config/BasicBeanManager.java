@@ -3,6 +3,7 @@ package ru.mail.teamcity.ssh.config;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import jetbrains.buildServer.users.SUser;
+import jetbrains.buildServer.util.StringUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,8 +98,12 @@ public final class BasicBeanManager {
      */
     private void write(@NotNull final File file, @NotNull AbstractBean bean) throws JAXBException {
         synchronized (getOrCreateLock(file)) {
-            bean.setPassword(EncryptUtil.scramble(bean.getPassword()));
-            bean.setPrivateKey(EncryptUtil.scramble(bean.getPrivateKey()));
+            if (!StringUtil.isEmpty(bean.getPassword())) {
+                bean.setPassword(EncryptUtil.scramble(bean.getPassword()));
+            }
+            if (!StringUtil.isEmpty(bean.getPrivateKey())) {
+                bean.setPrivateKey(EncryptUtil.scramble(bean.getPrivateKey()));
+            }
             JAXBContext context = JAXBContext.newInstance(AbstractBean.class);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
