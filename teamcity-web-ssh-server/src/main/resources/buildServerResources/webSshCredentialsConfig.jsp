@@ -29,6 +29,7 @@
     <td>
                 <textarea
                         name="privateKey"
+                        id="privateKey"
                         style="width:25em;"
                         readonly="true"
                         onfocus="this.removeAttribute('readonly');"

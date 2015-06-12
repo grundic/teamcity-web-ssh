@@ -4,11 +4,15 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.jcraft.jsch.*;
 import jetbrains.buildServer.users.SUser;
+import jetbrains.buildServer.util.StringUtil;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.teamcity.ssh.config.HostBean;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
 /**
@@ -21,11 +25,19 @@ public final class ShellManager {
     private ShellManager() {
     }
 
-    public static void createSshConnection(@NotNull SUser user, @NotNull HostBean host, @NotNull AtmosphereResource resource) throws IOException, JSchException {
+    public static void createSshConnection(@NotNull SUser user, @NotNull HostBean host, @NotNull AtmosphereResource resource) throws IOException, JSchException, NoSuchAlgorithmException {
         JSch jsch = new JSch();
 
+        if (host.getPrivateKey() != null && StringUtil.isNotEmpty(host.getPrivateKey())) {
+            jsch.addIdentity(md5(host.getPrivateKey()), host.getPrivateKey().getBytes(), null, null);
+        }
+
         Session sshSession = jsch.getSession(host.getDelegate().getLogin(), host.getHost(), host.getPort());
-        sshSession.setPassword(host.getDelegate().getPassword());
+
+        if (host.getDelegate().getPassword() != null && StringUtil.isNotEmpty(host.getDelegate().getPassword())) {
+            sshSession.setPassword(host.getDelegate().getPassword());
+        }
+
         sshSession.setConfig("StrictHostKeyChecking", "no");
 
         sshSession.connect(30000);
@@ -38,6 +50,12 @@ public final class ShellManager {
         shellChannel.connect();
 
         add(user, resource.uuid(), new SshConnectionInfo(shellChannel, thread));
+    }
+
+    private static String md5(String data) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("MD5");
+        digest.update(data.getBytes());
+        return String.format("%032x", new BigInteger(1, digest.digest()));
     }
 
     private static synchronized void add(@NotNull SUser user, @NotNull String uuid, @NotNull SshConnectionInfo connectionInfo) {

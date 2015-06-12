@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Type;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
@@ -78,6 +79,9 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
         } catch (JSchException e) {
             sendError(resource, "Ssh error", "Error establishing connection:" + e.getMessage());
             e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            sendError(resource, "Algorithm not found", "MD5 algorithm was not found:" + e.getMessage());
         }
 
         resource.setBroadcaster(resource.getAtmosphereConfig().getBroadcasterFactory().lookup("MyBroadcaster", true));

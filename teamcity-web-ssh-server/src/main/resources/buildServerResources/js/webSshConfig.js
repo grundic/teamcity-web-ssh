@@ -25,9 +25,14 @@ BS.WebSshConfigurationListener = OO.extend(BS.ErrorsAwareListener, {
         this.getForm().highlightErrorField($("password"));
     },
 
-    onEmptyKeyFilePathError: function (elem) {
-        $("errorKeyFilePath").innerHTML = elem.firstChild.nodeValue;
-        this.getForm().highlightErrorField($("keyFilePath"));
+    onEmptyPrivateKeyError: function (elem) {
+        $("errorPrivateKey").innerHTML = elem.firstChild.nodeValue;
+        this.getForm().highlightErrorField($("privateKey"));
+    },
+
+    onJSchExceptionError: function (elem) {
+        $("errorPrivateKey").innerHTML = elem.firstChild.nodeValue;
+        this.getForm().highlightErrorField($("privateKey"));
     },
 
     onIoExceptionError: function (elem) {

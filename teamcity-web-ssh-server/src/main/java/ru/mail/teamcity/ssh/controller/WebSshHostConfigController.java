@@ -1,5 +1,8 @@
 package ru.mail.teamcity.ssh.controller;
 
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.KeyPairRSA;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.serverSide.SBuildServer;
@@ -143,9 +146,18 @@ public class WebSshHostConfigController extends BaseFormXmlController {
                 errors.addError("emptyLogin", "Login could not be empty.");
             }
 
-            // Password validation
-            if (StringUtil.isEmptyOrSpaces(bean.getPassword())) {
-                errors.addError("emptyPassword", "Password could not be empty.");
+            // Password and PrivateKey validation
+            if (StringUtil.isEmptyOrSpaces(bean.getPassword()) && StringUtil.isEmptyOrSpaces(bean.getPrivateKey())) {
+                errors.addError("emptyPassword", "One of password or private key should be given.");
+                errors.addError("emptyPrivateKey", "One of password or private key should be given.");
+            }
+
+            if (!StringUtil.isEmptyOrSpaces(bean.getPrivateKey())) {
+                try {
+                    KeyPairRSA.load(new JSch(), bean.getPrivateKey().getBytes(), null);
+                } catch (JSchException e) {
+                    errors.addError("JSchException", ExceptionUtil.getDisplayMessage(e).toString());
+                }
             }
         }
 

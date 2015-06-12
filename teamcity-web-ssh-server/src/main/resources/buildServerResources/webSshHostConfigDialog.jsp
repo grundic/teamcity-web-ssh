@@ -13,6 +13,7 @@
 
     function saveHostFields() {
         hostFields['login'] = $j("#login").val();
+        hostFields['privateKey'] = $j("#privateKey").val();
     }
 
     function createElementClone(elementId, newValue) {
@@ -42,6 +43,7 @@
             success: function (response) {
                 saveHostFields();
                 createElementClone('login', response.login);
+                createElementClone('privateKey', response.privateKey);
                 createElementClone('password');
             }
         });
@@ -51,13 +53,21 @@
         if (hostFields['login'] != undefined) {
             $j("#login").val(hostFields['login']);
         }
+        if (hostFields['privateKey'] != undefined) {
+            $j("#privateKey").val(hostFields['privateKey']);
+        }
+
         var loginCloned = createElementClone('login');
+        var privateKeyCloned = createElementClone('privateKey');
         var passwordCloned = createElementClone('password');
         loginCloned.hide();
+        privateKeyCloned.hide();
         passwordCloned.hide();
         $j("#login").prop('disabled', false);
+        $j("#privateKey").prop('disabled', false);
         $j("#password").prop('disabled', false);
         $j("#login").show();
+        $j("#privateKey").show();
         $j("#password").show();
     }
 
