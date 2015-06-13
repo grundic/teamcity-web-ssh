@@ -28,9 +28,12 @@
     <h2 class="noBorder">Ssh hosts configuration</h2>
 
     <div class="sidebarNote">
-        This is going to be a description.
-        A lot of lines here with couple of useful information. In case user is interested
-        he/she always can read more here.
+        On this page you can add personal ssh connections and later connect to configured host right from your browser.
+        Add individual host clicking on "Add new host button". If you have similar credentials for multiple hosts, you
+        can create preset clicking on "Add new preset button" and then use that preset in any host.
+        Plugin also adds link on build agent page to connect to specific agent. If you have configured host for
+        particular
+        build agent, you could connect to it from agent's page.
     </div>
 
     <%-- Hosts block --%>
