@@ -7,6 +7,7 @@
 <jsp:attribute name="head_include">
     <bs:linkScript>
         ${teamcityPluginResourcesPath}js/webSshShell.js
+        ${teamcityPluginResourcesPath}js/colors.js
         ${teamcityPluginResourcesPath}js/webSshShellErrorDialog.js
         ${teamcityPluginResourcesPath}lib/term.js
         ${teamcityPluginResourcesPath}lib/jquery-ui.js

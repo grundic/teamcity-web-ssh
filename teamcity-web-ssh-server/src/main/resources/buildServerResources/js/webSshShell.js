@@ -30,7 +30,8 @@ var WebSshShell = {
                 screenKeys: false,
                 useStyle: true,
                 cursorBlink: true,
-                convertEol: true
+                convertEol: true,
+                colors: webSshColorschemes.brewer_dark
             });
 
             term.on('data', function (data) {

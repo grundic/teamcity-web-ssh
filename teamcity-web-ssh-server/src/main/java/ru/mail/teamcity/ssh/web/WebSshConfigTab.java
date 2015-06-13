@@ -39,8 +39,6 @@ public class WebSshConfigTab extends SimpleCustomTab {
 
         addCssFile(pluginDescriptor.getPluginResourcesPath("css/webSshConfig.css"));
         addJsFile(pluginDescriptor.getPluginResourcesPath("js/webSshConfig.js"));
-        addJsFile(pluginDescriptor.getPluginResourcesPath("js/webSshShell.js"));
-        addJsFile(pluginDescriptor.getPluginResourcesPath("lib/term.js"));
 
         register();
     }

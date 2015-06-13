@@ -42,7 +42,7 @@ public final class ShellManager {
 
         sshSession.connect(30000);
         Channel shellChannel = sshSession.openChannel("shell");
-        ((ChannelShell) shellChannel).setPtyType("xterm");
+        ((ChannelShell) shellChannel).setPtyType("xterm-256color");
 
         ShellOutputProcessor thread = new ShellOutputProcessor(shellChannel.getInputStream(), resource);
         thread.start();
