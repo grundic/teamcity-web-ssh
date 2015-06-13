@@ -1,4 +1,4 @@
-Teamcity web-ssh
+Teamcity web-ssh :shell:
 =================
 
 Description
