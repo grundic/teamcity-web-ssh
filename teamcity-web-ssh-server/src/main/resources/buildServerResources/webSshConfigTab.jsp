@@ -50,6 +50,9 @@
                                     <span <c:if test="${not empty host.preset}">style="font-style: italic"</c:if>>
                                     ${host.delegate.login}@${host.host}:${host.port}
                                     </span>
+                                <c:if test="${not empty host.preset}">
+                                    <span style="color: #707070">(${host.preset.name})</span>
+                                </c:if>
                             </td>
                             <td class="highlight edit">
                                 <a href="webSshShell.html?id=${host.id}" target="_blank">
