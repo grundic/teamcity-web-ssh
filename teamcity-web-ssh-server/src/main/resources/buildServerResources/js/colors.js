@@ -1,26 +1,4 @@
 var webSshColorschemes = {
-    'solarized': [
-        '#073642',  // 00: black
-        '#dc322f',  // 01: red
-        '#859900',  // 02: green
-        '#b58900',  // 03: yellow
-        '#268bd2',  // 04: blue
-        '#d33682',  // 05: magenta
-        '#2aa198',  // 06: cyan
-        '#eee8d5',  // 07: white
-        '#002b36',  // 08: bright_black
-        '#cb4b16',  // 09: bright_red
-        '#586e75',  // 10: bright_green
-        '#657b83',  // 11: bright_yellow
-        '#839496',  // 12: bright_blue
-        '#6c71c4',  // 13: bright_magenta
-        '#93a1a1',  // 14: bright_cyan
-        '#fdf6e3',  // 15: bright_white
-
-        '#002b36',  // --: background
-        '#839496'   // --: foreground
-    ],
-
     'railscasts_dark_256': [
         '#2b2b2b',
         '#da4939',
