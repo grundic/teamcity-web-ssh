@@ -9,7 +9,14 @@
         ${teamcityPluginResourcesPath}js/webSshShell.js
         ${teamcityPluginResourcesPath}js/webSshShellErrorDialog.js
         ${teamcityPluginResourcesPath}lib/term.js
+        ${teamcityPluginResourcesPath}lib/jquery-ui.js
     </bs:linkScript>
+
+    <bs:linkCSS>
+        ${teamcityPluginResourcesPath}css/jquery-ui.css
+        ${teamcityPluginResourcesPath}css/jquery-ui.structure.css
+    </bs:linkCSS>
+
 
     <script type="text/javascript">
     (function (event) {
@@ -22,7 +29,7 @@
     </jsp:attribute>
 
     <jsp:attribute name="body_include">
-        <div id="command" tabindex="1" style="background-color: crimson">
+        <div id="command" tabindex="1">
             <div id="terminal"></div>
         </div>
 

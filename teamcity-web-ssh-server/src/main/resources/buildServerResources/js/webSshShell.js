@@ -14,7 +14,7 @@ var WebSshShell = {
         var request = {
             url: base_uri + controllerUrl + '?' + query,
             contentType: "application/json",
-            logLevel: 'debug',
+            logLevel: 'info',
             transport: transport,
             trackMessageLength: true,
             reconnectOnServerError: false,
@@ -42,6 +42,33 @@ var WebSshShell = {
             });
 
             term.open($(shellId));
+
+            $j('#terminal div:first-child').resizable({
+                ghost: true,
+                stop: function (event, ui) {
+                    WebSshShell.resizeTerminal(
+                        term,
+                        subSocket,
+                        this.uuid,
+                        ui.originalSize.width,
+                        ui.size.width,
+                        ui.originalSize.height,
+                        ui.size.height
+                    );
+                }
+            });
+
+            // stretch terminal to window width
+            WebSshShell.resizeTerminal(
+                term,
+                subSocket,
+                this.uuid,
+                $j('#terminal div:first-child').width(),
+                $j('#terminal').width(),
+                $j('#terminal div:first-child').height(),
+                $j('#terminal div:first-child').height()
+            );
+
         };
 
         request.onClientTimeout = function (r) {
@@ -88,5 +115,14 @@ var WebSshShell = {
         };
 
         subSocket = socket.subscribe(request);
+    },
+
+    resizeTerminal: function (term, subSocket, uuid, oldWidth, newWidth, oldHeight, newHeight) {
+        var x = (newWidth / oldWidth) * term.cols | 0;
+        var y = (newHeight / oldHeight) * term.rows | 0;
+
+        term.resize(x, y);
+        var resizeData = atmosphere.util.stringifyJSON({'x': x, 'y': y});
+        subSocket.push(atmosphere.util.stringifyJSON({'resize': resizeData, 'uuid': uuid}));
     }
 };

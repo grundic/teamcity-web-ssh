@@ -109,7 +109,6 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
             Map<String, String> jsonRoot = new Gson().fromJson(message, type);
             SUser user = SessionUser.getUser(response.resource().getRequest());
 
-            String stdin = jsonRoot.get("stdin");
             String uuid = response.resource().uuid();
             if (uuid == null) {
                 return;
@@ -118,8 +117,22 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
             if (connectionInfo == null) {
                 return;
             }
-            PrintStream inputToChannel = new PrintStream(connectionInfo.getChannel().getOutputStream(), true);
-            inputToChannel.write(stdin.getBytes());
+
+            String stdin = jsonRoot.get("stdin");
+            if (stdin != null && StringUtils.isNotEmpty(stdin)) {
+                PrintStream inputToChannel = new PrintStream(connectionInfo.getChannel().getOutputStream(), true);
+                inputToChannel.write(stdin.getBytes());
+            }
+
+            String resize = jsonRoot.get("resize");
+            if (resize != null && StringUtils.isNotEmpty(resize)) {
+                Type resizeType = new TypeToken<Map<String, Integer>>() {
+                }.getType();
+                Map<String, Integer> jsonResize = new Gson().fromJson(resize, resizeType);
+                int x = jsonResize.get("x");
+                int y = jsonResize.get("y");
+                connectionInfo.getChannel().setPtySize(x, y, 0, 0);
+            }
         }
     }
 
