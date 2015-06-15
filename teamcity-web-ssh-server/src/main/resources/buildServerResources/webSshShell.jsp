@@ -6,8 +6,9 @@
 <bs:page>
 <jsp:attribute name="head_include">
     <bs:linkScript>
+        ${teamcityPluginResourcesPath}js/webSshCommon.js
         ${teamcityPluginResourcesPath}js/webSshShell.js
-        ${teamcityPluginResourcesPath}js/colors.js
+        ${teamcityPluginResourcesPath}js/webSshColorSchemes.js
         ${teamcityPluginResourcesPath}js/webSshShellErrorDialog.js
         ${teamcityPluginResourcesPath}lib/term.js
         ${teamcityPluginResourcesPath}lib/jquery-ui.js
@@ -23,7 +24,13 @@
     (function (event) {
         $j(document).ready(function (event) {
             $j(document).unbind("keydown");
-            WebSshShell.createShell(event, "${queryString}");
+
+            WebSshCommon.addThemesToSelect('#theme');
+
+            <c:if test="${not empty bean}">
+            WebSshShell.createShell(event, "${bean.id}", "${bean.theme}");
+            $j('#theme').val("${bean.theme}");
+            </c:if>
         });
     })();
     </script>
@@ -32,8 +39,23 @@
     <jsp:attribute name="body_include">
         <div id="command" tabindex="1">
             <div id="terminal"></div>
+            <div id="themeContainer" style="display: none">
+                <label for="theme">Select theme for terminal:</label>
+                <select id="theme">
+                    <option value="">-- Select theme --</option>
+                </select>
+            </div>
         </div>
 
-        <div id="error" class="error"></div>
+
+        <c:choose>
+            <c:when test="${not empty errors}">
+                <div class="error">
+                    <c:forEach var="error" items="${errors.errors}">
+                        <p><c:out value="${error.id}: ${error.message}"/></p>
+                    </c:forEach>
+                </div>
+            </c:when>
+        </c:choose>
     </jsp:attribute>
 </bs:page>

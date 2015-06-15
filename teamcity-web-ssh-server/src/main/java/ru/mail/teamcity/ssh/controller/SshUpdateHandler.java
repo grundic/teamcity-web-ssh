@@ -49,13 +49,10 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
         HostBean host = null;
 
         String id = resource.getRequest().getParameter("id");
-        String ip = resource.getRequest().getParameter("ip");
 
         try {
             if ((id != null) && StringUtils.isNotEmpty(id)) {
                 host = HostManager.load(user, id);
-            } else if ((ip != null) && StringUtils.isNotEmpty(ip)) {
-                host = HostManager.findHostByIp(user, ip);
             }
         } catch (JAXBException e) {
             e.printStackTrace();
@@ -63,13 +60,11 @@ public class SshUpdateHandler extends AbstractReflectorAtmosphereHandler {
             return;
         } catch (HostNotFoundException e) {
             e.printStackTrace();
-            sendError(resource, "Host not found", "Can't find required host! Please, check parameters!");
+            sendError(resource, "Host not found", "Can't get host! Please, check parameters 'id' or 'ip' are correct.");
             return;
         }
-
-
+        
         if (host == null) {
-            sendError(resource, "Can't get host! Please, check parameters 'id' or 'ip' are correct.");
             resource.getResponse().close();
             return;
         }

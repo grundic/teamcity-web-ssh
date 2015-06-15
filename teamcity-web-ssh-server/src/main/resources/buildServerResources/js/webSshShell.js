@@ -3,7 +3,7 @@
 var WebSshShell = {
     terminals: {},
 
-    createShell: function (event, query) {
+    createShell: function (event, hostId, hostTheme) {
         var subSocket;
         var socket = atmosphere;
         var transport = 'websocket';
@@ -12,7 +12,7 @@ var WebSshShell = {
         var term;
 
         var request = {
-            url: base_uri + controllerUrl + '?' + query,
+            url: base_uri + controllerUrl + '?id=' + hostId,
             contentType: "application/json",
             logLevel: 'info',
             transport: transport,
@@ -31,6 +31,7 @@ var WebSshShell = {
                 useStyle: true,
                 cursorBlink: true,
                 convertEol: true,
+                colors: webSshColorschemes[hostTheme]
             });
 
             term.on('data', function (data) {
@@ -69,7 +70,8 @@ var WebSshShell = {
                 $j('#terminal div:first-child').height()
             );
 
-            WebSshShell.createThemeSelect(term);
+            WebSshShell.handleThemeChange(term);
+            $j('#themeContainer').show();
         };
 
         request.onClientTimeout = function (r) {
@@ -127,18 +129,9 @@ var WebSshShell = {
         subSocket.push(atmosphere.util.stringifyJSON({'resize': resizeData, 'uuid': uuid}));
     },
 
-    createThemeSelect: function (term) {
-        var themeSelect = '<select id="themes"></select>';
-        $j("#command").append(themeSelect);
 
-        var sortedThemes = _.object(_.sortBy(_.pairs(webSshColorschemes), function (o) {
-            return o[0]
-        }));
-        for (var theme in sortedThemes) {
-            $j('<option value="' + theme + '">' + theme + '</option>').appendTo('#themes');
-        }
-
-        $j("#themes").change(function () {
+    handleThemeChange: function (term) {
+        $j("#theme").change(function () {
             var colors = webSshColorschemes[$j(this).val()];
             term.colors = colors.slice(0, -2).concat(Terminal._colors.slice(16, -2), colors.slice(-2));
             $j(".terminal")[0].style.backgroundColor = term.colors[256];

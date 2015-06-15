@@ -85,6 +85,10 @@
         $j('#presetId').change(function () {
             setPresetOrHostFields($j(this).val());
         });
+
+        // configure theme select
+        WebSshCommon.addThemesToSelect('#theme');
+        $j('#theme').val("${bean.theme}");
     });
 
 </script>
@@ -121,6 +125,16 @@
             <td>
                 <forms:textField name="port" style="width:8em;" maxlength="6" value="${bean.port}"/>
                 <span class="error" id="errorPort"></span>
+            </td>
+        </tr>
+
+        <tr id="themesContainer">
+            <th><label for="themes">Terminal theme:</label></th>
+            <td>
+                <forms:select name="theme" enableFilter="true" style="width:25em">
+                    <option value="">-- Select theme --</option>
+                </forms:select>
+                <span class="error" id="errorTheme"></span>
             </td>
         </tr>
 

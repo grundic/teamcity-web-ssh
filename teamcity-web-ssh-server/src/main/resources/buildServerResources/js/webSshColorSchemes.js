@@ -2937,6 +2937,6 @@ var webSshColorschemes = {
         '#ebf8ff',
         '#ebf8ff',
         '#516d7b'
-    ],
+    ]
 
 };

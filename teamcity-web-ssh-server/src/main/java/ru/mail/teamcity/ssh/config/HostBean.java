@@ -20,6 +20,7 @@ public class HostBean extends AbstractBean {
         bean.setLogin(another.getLogin());
         bean.setPassword(another.getPassword());
         bean.setPrivateKey(another.getPrivateKey());
+        bean.setTheme(another.getTheme());
 
         bean.setPresetId(another.getPresetId());
         bean.setPreset(another.getPreset());
@@ -37,6 +38,9 @@ public class HostBean extends AbstractBean {
 
     @StateField
     int port = 22;
+
+    @StateField
+    String theme = "";
 
     public UUID getPresetId() {
         return presetId;
@@ -74,5 +78,13 @@ public class HostBean extends AbstractBean {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(String theme) {
+        this.theme = theme;
     }
 }
